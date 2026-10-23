@@ -258,13 +258,12 @@ my_impute <- function(
   }
 
   if (method == "seqknn") {
-    # NAguideR uses SeqKnn::SeqKNN, but on many systems multiUS::seqKNNimp is available too.
-    if (requireNamespace("SeqKnn", quietly = TRUE)) {
-      out <- SeqKnn::SeqKNN(x, k = k)
-    } else if (requireNamespace("multiUS", quietly = TRUE)) {
+    # NAguideR originally used SeqKnn, but multiUS::seqKNNimp is the reliable, 
+    # supported alternative that avoids modern package installation and deployment failures.
+    if (requireNamespace("multiUS", quietly = TRUE)) {
       out <- as.matrix(multiUS::seqKNNimp(as.data.frame(x), k = k))
     } else {
-      stop("seqknn requires package 'SeqKnn' (preferred) or 'multiUS'.", call. = FALSE)
+      stop("seqknn imputation requires the 'multiUS' package.", call. = FALSE)
     }
     rownames(out) <- rn; colnames(out) <- cn
     return(out)

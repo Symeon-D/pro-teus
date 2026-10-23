@@ -23,5 +23,5 @@ if (FALSE) {
 
   # --- ADD HERE anything scan_deps.R reports as missing, e.g.: ---
   library(AnnotationDbi); library(curl); library(rlang); library(GMSimpute); 
- library(multiUS); library(SeqKnn); library(DreamAI)
+ library(multiUS); library(DreamAI)
 }
