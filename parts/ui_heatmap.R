@@ -1,0 +1,57 @@
+tab_heatmap <- function() {
+  tabPanel("5. Heatmap", sidebarLayout(
+    sidebarPanel(width = 4, style = "max-height: 90vh; overflow-y: auto;",
+      h4("Proteins & samples"),
+      radioButtons("hm_source", NULL,
+                   c("All proteins in the expression file" = "all",
+                     "Proteins from the selected subset(s)" = "subset"),
+                   selected = "all"),
+      uiOutput("hm_sets_ui"),
+      uiOutput("inc_groups_ui"),
+      uiOutput("extra_vars_ui"),
+      uiOutput("extra_msg"),
+      uiOutput("extra_colors_ui"),
+      h4("Heatmap"),
+      checkboxInput("merge", "Merge replicates (group means)", FALSE),
+      textInput("top_n", "Top N variable proteins ('all' for every protein)", "all"),
+      checkboxInput("scale_rows", "Z-score rows", TRUE),
+      checkboxInput("show_sample_names", "Show sample names", TRUE),
+      checkboxInput("show_group_names", "Show group names", TRUE),
+      checkboxInput("show_genes", "Show gene names", FALSE),
+      checkboxInput("cluster_rows", "Cluster rows", FALSE),
+      conditionalPanel("input.cluster_rows",
+        checkboxInput("show_row_dend", "Show row dendrogram", TRUE),
+        selectInput("dist_param", "Distance",
+                    c("euclidean", "manhattan", "maximum", "canberra", "minkowski")),
+        selectInput("hclust_param", "Linkage",
+                    c("average", "complete", "single", "ward.D", "ward.D2", "mcquitty")),
+        selectInput("split_by", "Split rows by",
+                    c("None" = "none", "Row split (slices)" = "split", "K-means" = "km")),
+        conditionalPanel("input.split_by != 'none'",
+          numericInput("split_n", "Number of clusters", 2, min = 2, step = 1))),
+      sliderInput("zlim", "Z-score limits", -6, 6, c(-2, 2), step = 0.5),
+      fluidRow(
+        column(4, colourInput("color_low", "Low", "blue")),
+        column(4, colourInput("color_mid", "Mid", "white")),
+        column(4, colourInput("color_high", "High", "red"))),
+      h4("Appearance"),
+      numericInput("col_fontsize", "Sample label font (blank = auto-fit)", NA, min = 4),
+      numericInput("row_fontsize", "Gene label font", 12, min = 4),
+      numericInput("group_fontsize", "Group label font (blank = auto-fit)", NA, min = 4),
+      h5("Z-score scale bar"),
+      sliderInput("leg_width", "Width (mm)", 3, 30, 10, step = 1),
+      sliderInput("leg_height", "Z-score height (mm)", 15, 300, 40, step = 1),
+      sliderInput("leg_font", "Font size (pt)", 6, 30, 16, step = 1),
+      numericInput("width_mm", "Width mm (blank = auto)", NA),
+      numericInput("height_mm", "Height mm (blank = auto)", NA),
+      h4("Export"),
+      downloadButton("dl_png", "PNG"),
+      downloadButton("dl_csv", "Matrix + clusters (CSV)")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Heatmap", br(), plotOutput("hm_plot", height = "calc(100vh - 180px)")),
+        tabPanel("Processed matrix", br(), tableOutput("mat_tbl")))
+    )
+  ))
+}
