@@ -334,7 +334,7 @@
         column(3, tags$label("Contrasts"), br(),
                shinyWidgets::dropdownButton(
                  label = "Select contrasts", circle = FALSE, status = "default", inline = TRUE,
-                 checkboxGroupInput("vol_contrasts", NULL, choices = cn, selected = cn[1]))),
+                 checkboxGroupInput("vol_contrasts", NULL, choices = cn, selected = cn))),
         column(2, selectInput("vol_filter", "Significance on", c("adj.P.Val", "P.Value"))),
         column(2, selectInput("vol_y", "Y axis", c("P.Value", "adj.P.Val"))),
         column(2, numericInput("vol_lfc", "|log2FC| cutoff", lfc0, min = 0, step = 0.05)),

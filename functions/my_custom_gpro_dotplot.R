@@ -75,21 +75,45 @@ my_custom_gpro_dotplot <- function(GO_clusters, ont, top_n, term_size_legend, su
 
   size_label <- if (term_size_legend == "percentage") "Gene Ratio (%)" else "Gene Count"
 
-  # legend markers follow the cluster markers: one shape everywhere -> that shape in the single legend;
-  # a mix -> one size legend per shape, each with ITS OWN clusters' representative values
-  size_legend_override <- NULL; mixed <- FALSE; size_limits <- range(GO_clusters[[size_var]], na.rm = TRUE)
+  # legend markers follow the cluster markers: one shape everywhere -> one column of that shape; two different
+  # shapes -> ONE legend with two columns (5 representative sizes per shape, taken from that shape's own clusters).
+  # A single guide keeps the same position / title as the one-shape case and keeps the columns close together.
+  size_limits <- range(GO_clusters[[size_var]], na.rm = TRUE)
+  size_guide <- guide_legend(order = 1, title.position = "top")
+  size_breaks_final <- size_breaks
   if (multi_cluster && !is.null(shape_map)) {
     shp_by_group <- shape_map[as.character(levels(GO_clusters$group_name))]
     shp_u <- unique(as.numeric(shp_by_group[!is.na(shp_by_group)]))
-    if (length(shp_u) == 1) size_legend_override <- list(shape = shp_u, fill = "grey30", colour = "grey30")
-    if (length(shp_u) > 1) mixed <- TRUE
+    if (length(shp_u) == 1) {
+      size_guide <- guide_legend(order = 1, title.position = "top",
+                                 override.aes = list(shape = shp_u, fill = "grey30", colour = "grey30"))
+    } else if (length(shp_u) > 1) {
+      pick5 <- function(v) {
+        u <- sort(unique(v))
+        if (length(u) >= 5) u[round(seq(1, length(u), length.out = 5))]
+        else if (length(u) > 1) seq(min(u), max(u), length.out = 5)
+        else seq(size_limits[1], size_limits[2], length.out = 5)
+      }
+      reps <- lapply(shp_u[1:2], function(sh) {
+        grp <- names(shp_by_group)[as.numeric(shp_by_group) == sh]
+        v <- GO_clusters[[size_var]][as.character(GO_clusters$group_name) %in% grp]
+        pick5(if (length(v)) v else GO_clusters[[size_var]])
+      })
+      b1 <- reps[[1]]; b2 <- reps[[2]]
+      # breaks must be distinct: nudge a value of group 2 that equals one of group 1 (inside the scale limits)
+      b2 <- ifelse(b2 %in% b1, ifelse(b2 >= size_limits[2], b2 * (1 - 1e-6), b2 * (1 + 1e-6)), b2)
+      size_breaks_final <- c(b1, b2)                   # NOT sorted: column 1 = shape 1, column 2 = shape 2
+      size_guide <- guide_legend(order = 1, title.position = "top", ncol = 2, byrow = FALSE,
+                                 override.aes = list(shape = c(rep(shp_u[1], length(b1)), rep(shp_u[2], length(b2))),
+                                                     fill = "grey30", colour = "grey30"))
+    }
   }
   plt <- plt + scale_size(
     name = size_label,
     limits = size_limits,
-    breaks = size_breaks,
-    labels = round(size_breaks, 1),
-    guide = if (mixed) "none" else guide_legend(title.position = "top")
+    breaks = size_breaks_final,
+    labels = round(size_breaks_final, 1),
+    guide = size_guide
   )
 
   # Handle color scaling
@@ -114,9 +138,7 @@ my_custom_gpro_dotplot <- function(GO_clusters, ont, top_n, term_size_legend, su
     ggtitle(title_text) +
     theme_bw(base_size = 15) +
     theme(panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5)) +
-    guides(size = if (mixed) "none" else if (is.null(size_legend_override)) guide_legend(order = 1) else
-             guide_legend(order = 1, override.aes = size_legend_override),
-           color = guide_colorbar(order = 2)) +
+    guides(size = size_guide, color = guide_colorbar(order = 2)) +
     scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 60))
 
   if (multi_cluster) {
@@ -134,38 +156,8 @@ my_custom_gpro_dotplot <- function(GO_clusters, ont, top_n, term_size_legend, su
   }
 
   plt <- plt + theme(legend.spacing.y = unit(0.05, "cm"), legend.justification = "top", legend.box.just = "left")
-
-  if (mixed) {
-    pick5 <- function(v) { u <- sort(unique(v)); if (length(u) > 5) u[round(seq(1, length(u), length.out = 5))] else u }
-    # colour bar (the only legend left in the main plot)
-    leg_col <- cowplot::get_legend(plt + theme(legend.position = "right"))
-    plt0 <- plt + theme(legend.position = "none")
-    legs <- lapply(shp_u[1:2], function(sh) {
-      grp <- names(shp_by_group)[as.numeric(shp_by_group) == sh]
-      v <- GO_clusters[[size_var]][as.character(GO_clusters$group_name) %in% grp]
-      if (!length(v)) v <- GO_clusters[[size_var]]
-      b <- pick5(v)
-      g <- ggplot(data.frame(x = 1, y = 1, s = b), aes(x, y, size = s)) +
-        geom_point(shape = sh, fill = "grey30", colour = "grey30") +
-        scale_size(name = NULL, limits = size_limits, breaks = b, labels = round(b, 1)) +
-        guides(size = guide_legend(override.aes = list(shape = sh, fill = "grey30", colour = "grey30"))) +
-        theme_void(base_size = 15) + theme(legend.position = "right")
-      cowplot::get_legend(g)
-    })
-    ttl <- cowplot::ggdraw() + cowplot::draw_label(size_label, fontface = "plain", size = 15, hjust = 0.5)
-    topleft <- function(g) cowplot::ggdraw() + cowplot::draw_grob(g, halign = 0, valign = 1)   # no centring -> no big gaps
-    lw <- function(g) tryCatch(grid::convertWidth(sum(g$widths), "in", valueOnly = TRUE), error = function(e) 1)
-    size_row <- cowplot::plot_grid(topleft(legs[[1]]), topleft(legs[[2]]), nrow = 1,
-                                   rel_widths = c(lw(legs[[1]]), lw(legs[[2]])))
-    # stack with their NATURAL heights (title, size legends, colour bar) and a spacer below, so the
-    # size legend sits right on top of the colour bar instead of floating at the top of the figure
-    hin <- function(g) tryCatch(grid::convertHeight(sum(g$heights), "in", valueOnly = TRUE), error = function(e) 1.6)
-    H_est <- max(3.8, 0.26 * length(unique(GO_clusters$term_name)) + 1.6)            # figure height in inches
-    h_t <- 0.3; h_s <- max(hin(legs[[1]]), hin(legs[[2]])) + 0.05; h_c <- hin(leg_col) + 0.05
-    right <- cowplot::plot_grid(ttl, size_row, topleft(leg_col), NULL, ncol = 1,
-                                rel_heights = c(h_t, h_s, h_c, max(0.2, H_est - h_t - h_s - h_c)))
-    plt <- cowplot::plot_grid(plt0, right, nrow = 1, rel_widths = c(1, 0.24))
-  }
+  if (utils::packageVersion("ggplot2") >= "3.5.0")      # keep the two size columns close together
+    plt <- plt + theme(legend.key.spacing.x = unit(0.08, "cm"))
 
   return(plt)
 }
