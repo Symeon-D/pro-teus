@@ -107,12 +107,7 @@ PROTEUS_JS <- sprintf("
 
 ui <- navbarPage(
   "Pro-teus", id = "nav", windowTitle = "Pro-teus",
-  header = tagList(
-    tags$head(tags$style(HTML(PROTEUS_CSS)), tags$script(HTML(PROTEUS_JS))),
-    div(style = "background:#fff7e0;border-bottom:1px solid #e6c200;padding:6px 14px;font-size:13px;color:#333;",
-        "Public server: uploaded files are processed on third-party cloud infrastructure and deleted when your ",
-        "session ends. Do not upload sensitive or unpublished data you are not comfortable sharing; use the demo ",
-        "dataset or run the app locally instead.")),
+  header = tags$head(tags$style(HTML(PROTEUS_CSS)), tags$script(HTML(PROTEUS_JS))),
   tab_data(), RT$body_norm$tab, RT$body_impute$tab, RT$body_de$tab, RT$body_heatmap$tab, RT$body_ora$tab,
   footer = div(
     style = paste("position:fixed; right:14px; bottom:14px; z-index:3000; background:#fff;",
