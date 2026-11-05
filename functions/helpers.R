@@ -289,3 +289,13 @@ plot_missing_pattern <- function(mat, groups = NULL, group_colors = NULL) {
 
 # the gene / protein name column is called "Names" everywhere the user sees it
 as_names <- function(df) { if ("Protein" %in% names(df)) names(df)[names(df) == "Protein"] <- "Names"; df }
+
+# ---- compact controls: width follows the longest of title / options ----
+fit_w <- function(label, choices = NULL, min = 5, pad = 3.2) {
+  n <- max(nchar(as.character(c(label, choices))), 1L)
+  paste0(round(max(min, 0.56 * n + pad), 1), "em")
+}
+ctl_row <- function(...) shiny::div(style = "display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end;", ...)
+ctl_dd  <- function(label, ..., btn = "Select contrasts")
+  shiny::div(style = "margin-bottom:15px;", shiny::tags$label(label), shiny::br(),
+             shinyWidgets::dropdownButton(label = btn, circle = FALSE, status = "default", inline = TRUE, ...))

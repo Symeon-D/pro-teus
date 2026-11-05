@@ -1,5 +1,5 @@
 tab_de <- function() {
-  tabPanel("4. Differential analysis",
+  tabPanel("5. Differential analysis",
     tags$script(HTML("
       function contrastAct(i, a) { Shiny.setInputValue('c_action', {i: i, a: a, t: Date.now()}, {priority: 'event'}); }
       function contrastRename(el, i) { Shiny.setInputValue('c_rename', {i: i, name: el.innerText.trim(), t: Date.now()}, {priority: 'event'}); }")),

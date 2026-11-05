@@ -155,16 +155,18 @@ final_expr <- reactive(imp_rv() %||% norm_rv() %||% filt_rv() %||% raw_aligned()
 status_ui <- renderUI({
   req(raw_aligned())
   dimtxt <- function(m) sprintf("%d x %d", nrow(m), ncol(m))
+  sv_now <- tryCatch(sva_sv_df(), error = function(e) NULL)
   badge <- function(txt, on) tags$span(class = paste("label", if (on) "label-success" else "label-default"),
                                        style = "margin-right:4px; font-size:12px;", txt)
   tags$div(style = "margin-bottom:10px;",
     badge(paste("Raw", dimtxt(raw_aligned())), TRUE), "\u2192",
     badge(if (is.null(filt_rv())) "Filter: not applied" else paste("Filtered", dimtxt(filt_rv())), !is.null(filt_rv())), "\u2192",
     badge(if (is.null(norm_rv())) "Normalization: not applied" else paste("Normalized:", norm_label()), !is.null(norm_rv())), "\u2192",
-    badge(if (is.null(imp_rv())) "Imputation: not applied" else paste("Imputed:", imp_label()), !is.null(imp_rv())),
+    badge(if (is.null(imp_rv())) "Imputation: not applied" else paste("Imputed:", imp_label()), !is.null(imp_rv())), "\u2192",
+    badge(if (is.null(sv_now)) "SVs: none" else paste("SVs:", paste(colnames(sv_now), collapse = ", ")), !is.null(sv_now)),
     tags$small(style = "color:#777; margin-left:8px;", "Downstream tabs use the latest stage."))
 })
-for (id in c("pipeline_status_data", "pipeline_status_norm", "pipeline_status_imp", "pipeline_status_de"))
+for (id in c("pipeline_status_data", "pipeline_status_norm", "pipeline_status_imp", "pipeline_status_sva", "pipeline_status_de"))
   output[[id]] <- status_ui
 
 # ---------------- missingness filter ----------------

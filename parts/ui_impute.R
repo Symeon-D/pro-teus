@@ -36,7 +36,11 @@ tab_impute <- function() {
             tabPanel("Classic metrics", br(), plotOutput("imp_classic", height = "900px")),
             tabPanel("DE concordance", br(), plotOutput("imp_de_concordance", height = "600px")))),
         tabPanel("Applied result", br(), textOutput("imp_applied_txt"),
-                 plotOutput("imp_after_plot", height = "420px"))
+                 plotOutput("imp_after_plot", height = "420px"),
+                 hr(),
+                 uiOutput("imp_pca_ui"),
+                 downloadButton("dl_imp_pca", "PCA as PNG"),
+                 plotOutput("imp_after_pca", height = "460px"))
       )
     )
   ))

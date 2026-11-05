@@ -219,28 +219,16 @@ subset_from_rules <- function(dtm, rules, mode = c("AND", "OR"), only = FALSE) {
 # (it saves a PNG into the working dir; we run it in a temp dir and keep the ggplot)
 # ==========================================================
 volcano_from_top <- function(top, title, filter_choice = "adj.P.Val", y_axis_choice = "P.Value",
-                             l2FC_thresh = 1, p_thresh = 0.05, show_names = "none",
-                             which_genes = "all", grid_lines = FALSE, label_size = 2.5,
-                             highlight = character(0), width = 6.5, height = 5.8) {
+                             l2FC_thresh = 1, p_thresh = 0.05, genes = character(0),
+                             grid_lines = FALSE, label_size = 2.5, width = 6.5, height = 5.8) {
   top$Gene <- top$Protein
-  p <- run_in_tmpdir(function()
+  genes <- intersect(genes, top$Gene)
+  run_in_tmpdir(function()
     my_volcano_plot_proteomics(
       DE_res = top, filter_choice = filter_choice, y_axis_choice = y_axis_choice,
       l2FC_thresh = l2FC_thresh, p_thresh = p_thresh, plot_title = title,
-      show_names = show_names, which_genes = which_genes, grid_lines = grid_lines,
-      save_prefix = "tmp", width = width, height = height, label_size = label_size))$value
-  hl <- top[top$Protein %in% highlight, , drop = FALSE]
-  if (nrow(hl) > 0) {
-    hl$y_value <- -log10(hl[[y_axis_choice]])
-    p <- p +
-      ggplot2::geom_point(data = hl, ggplot2::aes(x = logFC, y = y_value), inherit.aes = FALSE,
-                          shape = 21, size = 3.2, stroke = 1.1, fill = NA, colour = "black") +
-      ggrepel::geom_label_repel(data = hl, ggplot2::aes(x = logFC, y = y_value, label = Gene),
-                                inherit.aes = FALSE, fontface = "bold", size = label_size + 0.5,
-                                box.padding = 0.5, max.overlaps = Inf, segment.colour = "black",
-                                fill = "white", label.size = 0.25)
-  }
-  p
+      show_names = if (length(genes)) "all" else "none", genes_of_interest = genes,   # boxed labels, box colour = side
+      grid_lines = grid_lines, save_prefix = "tmp", width = width, height = height, label_size = label_size))$value
 }
 
 # ==========================================================

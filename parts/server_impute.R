@@ -90,7 +90,7 @@ observeEvent(input$apply_imp, {
 })
 observeEvent(input$skip_imp, {
   imp_rv(imp_input()); imp_label("none (missing values kept)")
-  updateNavbarPage(session, "nav", selected = "4. Differential analysis")
+  updateNavbarPage(session, "nav", selected = "4. Batch & SVA")
 })
 
 output$imp_applied_txt <- renderText(if (is.null(imp_rv())) "No imputation applied yet." else paste("Applied:", imp_label()))
@@ -103,3 +103,21 @@ output$imp_after_plot <- renderPlot({
     scale_fill_manual(values = c(Observed = "grey40", Imputed = "#E07B54")) +
     labs(title = paste("Observed vs imputed values:", imp_label()), x = "log2 intensity") + theme_bw(base_size = 12)
 }, res = 100)
+
+# PCA of the imputed matrix (below the applied-method plot): colour by / shape by any sample-sheet variable
+pca_var_choices <- reactive(c("Group", setdiff(names(sample_meta()), c("Group", "Sample", input$sample_col))))
+output$imp_pca_ui <- renderUI({
+  ch <- pca_var_choices(); req(length(ch) > 0)
+  ctl_row(
+    selectInput("imp_pca_color", "Colour by", ch, selected = isolate(input$imp_pca_color) %||% "Group", width = fit_w("Colour by", ch)),
+    selectInput("imp_pca_shape", "Shape by", c("none", ch), selected = isolate(input$imp_pca_shape) %||% "none", width = fit_w("Shape by", c("none", ch))))
+})
+imp_pca_obj <- reactive({
+  m <- imp_rv(); req(m); cb <- input$imp_pca_color %||% "Group"; sb <- input$imp_pca_shape %||% "none"
+  p <- pca_one(m, sample_meta(), cb, sb, group_colors_all(), paste("PCA after imputation:", imp_label()))
+  validate(need(!is.null(p), "Not enough proteins without missing values (or samples) for a PCA."))
+  p
+})
+output$imp_after_pca <- renderPlot(imp_pca_obj(), res = 100)
+output$dl_imp_pca <- downloadHandler(filename = function() paste0("PCA_after_imputation_", imp_label(), ".png"),
+  content = function(file) ggplot2::ggsave(file, imp_pca_obj(), width = 8, height = 6, dpi = 300, bg = "white"))

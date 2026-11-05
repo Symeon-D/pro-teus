@@ -181,6 +181,23 @@ venn_of_detected <- function(input_matrix,
   y_half <- (diff(y_rng) / 2) * expand_limits
 
   # ── Plot Construction ────────────────────────────────────────────────────────
+  # ---- circle titles that never sit on top of each other ----
+  # long titles are wrapped; with 2 circles each title extends AWAY from the other one;
+  # with 3+ circles the titles are pushed apart by ggrepel (starting from the symmetric positions)
+  set_label_df$name <- vapply(as.character(set_label_df$name),
+                              function(x) paste(strwrap(x, width = 14), collapse = "\n"), character(1))
+  if (n_grps == 2) {
+    set_label_df$hj <- ifelse(set_label_df$X <= stats::median(set_label_df$X), 1, 0)
+    label_layer <- ggplot2::geom_text(
+      ggplot2::aes(X, Y, label = name, color = set_color, hjust = hj), data = set_label_df,
+      vjust = 0, size = final_group_label_size, fontface = "bold", lineheight = 0.9, show.legend = FALSE)
+  } else {
+    label_layer <- ggrepel::geom_text_repel(
+      ggplot2::aes(X, Y, label = name, color = set_color), data = set_label_df,
+      size = final_group_label_size, fontface = "bold", lineheight = 0.9, box.padding = 0.45,
+      point.padding = 0.2, min.segment.length = 0.3, max.overlaps = Inf, seed = 1, show.legend = FALSE)
+  }
+
   p <- ggplot2::ggplot() +
     ggplot2::geom_polygon(
       ggplot2::aes(X, Y, fill = computed_fill, group = id),
@@ -196,14 +213,7 @@ venn_of_detected <- function(input_matrix,
     ) +
     ggplot2::scale_color_identity(guide = "none") +
     # Group Labels
-    ggplot2::geom_text(
-      ggplot2::aes(X, Y, label = name, color = set_color),
-      data        = set_label_df,
-      vjust       = if (n_grps == 2) 0 else 0.5,
-      size        = final_group_label_size,
-      fontface    = "bold",
-      show.legend = FALSE
-    ) +
+    label_layer +
     # Intersection Count Numbers
     ggplot2::geom_text(
       ggplot2::aes(X, Y, label = count),

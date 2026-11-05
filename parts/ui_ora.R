@@ -44,7 +44,7 @@ gsea_main_panel <- function() {
 
 tab_ora <- function() {
   has <- function(m) sprintf("input.enrich_modules && input.enrich_modules.indexOf('%s') > -1", m)
-  tabPanel("6. Pathway enrichment", tags$script(HTML(ORA_JS)), sidebarLayout(
+  tabPanel("7. Pathway enrichment", tags$script(HTML(ORA_JS)), sidebarLayout(
     sidebarPanel(width = 4, style = "max-height: 90vh; overflow-y: auto;",
       uiOutput("ora_avail"),
       checkboxGroupInput("enrich_modules", "Analysis", c("ORA" = "ora", "GSEA" = "gsea"),

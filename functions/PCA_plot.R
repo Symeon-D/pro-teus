@@ -209,7 +209,8 @@ my_plot_PCA_matrix <- function(expression_matrix,
       # Custom gender shape symbols
       pca_plot <- pca_plot + scale_shape_manual(values = c("Female" = 17, "Male" = 15))
     } else {
-      pca_plot <- pca_plot + scale_shape_manual(values = c(21, 22, 24, 25))
+      shp_pool <- c(21, 22, 24, 25, 23, 15, 16, 17, 18, 3, 4, 8, 7, 9, 10, 11, 12, 13, 14)   # plenty of distinct shapes
+      pca_plot <- pca_plot + scale_shape_manual(values = rep_len(shp_pool, nlevels(pca_data[[shape_by]])))
     }
   } else {
     pca_plot <- pca_plot + geom_point(size = 4, shape = 21, stroke = 0.8)

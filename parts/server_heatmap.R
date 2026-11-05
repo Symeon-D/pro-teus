@@ -73,10 +73,14 @@
 
   core <- reactive({
     cs <- hm_samples()
-    mat <- final_expr()[, cs, drop = FALSE]
+    mat <- hm_expr()[, cs, drop = FALSE]
     if (identical(input$hm_source, "subset")) {
       sel <- intersect(hm_selected_proteins(), rownames(mat))
       validate(need(length(sel) > 1, "Select gene set(s) with at least 2 proteins."))
+      mat <- mat[sel, , drop = FALSE]
+    } else if (identical(input$hm_source, "genes")) {
+      sel <- intersect(hm_genes(), rownames(mat))                # the user's order is kept
+      validate(need(length(sel) > 1, "Select at least 2 proteins (type, or paste a list)."))
       mat <- mat[sel, , drop = FALSE]
     }
     md <- sample_meta()[cs, , drop = FALSE]
@@ -89,17 +93,17 @@
     scr_h <- session$clientData$output_hm_plot_height
     res <- my_proteomics_heat_map_build(
       input_object = mat, sample_metadata = md,
-      top_n = if (tolower(tn) == "all" || tn == "") "all" else as.numeric(tn),
+      top_n = if (identical(input$hm_source, "genes") || tolower(tn) == "all" || tn == "") "all" else as.numeric(tn),
       merge = input$merge, cluster_rows = input$cluster_rows,
       show_row_dend = isTRUE(input$cluster_rows) && isTRUE(input$show_row_dend),
       dist_param = input$dist_param %||% "euclidean",
       hclust_param = input$hclust_param %||% "average",
-      scale_rows = input$scale_rows, show_genes = input$show_genes,
+      scale_rows = input$scale_rows, show_genes = isTRUE(input$show_genes) || identical(input$hm_source, "genes"),
       group_colors = group_colors(), zscore_limits = input$zlim,
       color_low = input$color_low, color_mid = input$color_mid,
       color_high = input$color_high,
-      col_fontsize = input$col_fontsize %||% NA, row_fontsize = input$row_fontsize,
-      group_fontsize = input$group_fontsize %||% NA,
+      col_fontsize = if (font_auto$col) NA else (input$col_fontsize %||% NA), row_fontsize = input$row_fontsize,
+      group_fontsize = if (font_auto$grp) NA else (input$group_fontsize %||% NA),
       width = if (!is.na(input$width_mm)) input$width_mm else if (!is.null(scr_w)) scr_w / 96 * 25.4,
       height = if (!is.na(input$height_mm)) input$height_mm else if (!is.null(scr_h)) scr_h / 96 * 25.4,
       row_split = rs, row_km = rk,
@@ -181,3 +185,33 @@
       updateNumericInput(session, "split_n", value = 2)
     }
   }, ignoreInit = TRUE)
+
+# ---- data source: covariate-corrected whenever the DE design had covariates (Batch and / or SVs) ----
+hm_expr <- reactive({
+  ce <- tryCatch(corrected_expr(), error = function(e) NULL)
+  if (!is.null(ce)) ce else final_expr()
+})
+# specific proteins: significant proteins of ALL ordinary contrasts, largest |t| first
+hm_lists <- reactive(ordered_lists(de_res()$single_names))
+hi <- picker_inputs(hm_lists)
+hm_picker <- protein_picker_server("pp_hm", sig = hi$sig, all = hi$all)
+hm_genes <- hm_picker$selected
+
+# ---- label fonts: the boxes show the auto-fitted size; typing a size switches to manual, "auto-fit" goes back ----
+font_auto <- reactiveValues(col = TRUE, grp = TRUE)
+font_prog <- reactiveValues(col = NA_real_, grp = NA_real_)           # the value we wrote ourselves
+observe({
+  cr <- core()
+  if (font_auto$col) { v <- round(cr$fonts$sample, 1); font_prog$col <- v; updateNumericInput(session, "col_fontsize", value = v) }
+  if (font_auto$grp) { v <- round(cr$fonts$group, 1);  font_prog$grp <- v; updateNumericInput(session, "group_fontsize", value = v) }
+})
+observeEvent(input$col_fontsize, {
+  v <- input$col_fontsize; if (is.null(v) || is.na(v)) return()
+  if (!isTRUE(all.equal(v, font_prog$col))) font_auto$col <- FALSE
+}, ignoreInit = TRUE)
+observeEvent(input$group_fontsize, {
+  v <- input$group_fontsize; if (is.null(v) || is.na(v)) return()
+  if (!isTRUE(all.equal(v, font_prog$grp))) font_auto$grp <- FALSE
+}, ignoreInit = TRUE)
+observeEvent(input$col_auto, font_auto$col <- TRUE)
+observeEvent(input$group_auto, font_auto$grp <- TRUE)

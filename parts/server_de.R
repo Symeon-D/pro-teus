@@ -2,17 +2,120 @@
   # built with its choices directly so that clicking the box always lists the variables
   output$de_covs_ui <- renderUI({
     app_gen(); req(other_cols())
-    selectizeInput("de_covs", "Additional covariates (e.g. Batch)", choices = other_cols(),
-                   multiple = TRUE, selected = isolate(input$de_covs))
+    sv <- colnames(sva_sv_df() %||% data.frame())
+    ch <- c(other_cols(), sv)
+    selectizeInput("de_covs", "Additional covariates (e.g. Batch; SVs from the Batch & SVA tab are preselected)",
+                   choices = ch, multiple = TRUE, selected = union(intersect(isolate(input$de_covs), ch), sv))
   })
 
   de_meta <- reactive({
     cs <- common()
     md <- sample_meta()[cs, , drop = FALSE]
+    sv <- sva_sv_df()                                          # surrogate variables chosen on the Batch & SVA tab
+    if (!is.null(sv)) md <- cbind(md, sv[rownames(md), , drop = FALSE])
     md$Group_de <- factor(make.names(md$Group), levels = make.names(unique(md$Group)))
     md
   })
   de_levels <- reactive(levels(de_meta()$Group_de))
+
+  # data with exactly the covariates of the DE design removed (NULL when the design had none)
+  corrected_expr <- reactive({
+    r <- de_res(); req(r); covs <- r$covs %||% character(0)
+    if (!length(covs)) return(NULL)
+    md <- de_meta(); d <- r$design; sm <- rownames(d)
+    correct_for_covariates(final_expr()[, sm, drop = FALSE], md[sm, , drop = FALSE], covs, md[sm, "Group_de"])
+  })
+  corrected_ok <- reactive(!is.null(tryCatch(corrected_expr(), error = function(e) NULL)))
+
+  # ---- protein lists: significant proteins of the chosen contrasts, largest |t| first ----
+  ordered_lists <- function(contrasts) {
+    r <- de_res(); req(r)
+    cns <- intersect(contrasts, r$single_names); allp <- rownames(r$dt)
+    if (!length(cns)) return(list(sig = character(0), all = allp))
+    dtm <- dt_matrix(r$dt)
+    tm <- vapply(cns, function(cn) { tt <- r$tops[[cn]]; v <- abs(setNames(tt$t, tt$Protein)[allp]); v[is.na(v)] <- 0; v }, numeric(length(allp)))
+    sg <- vapply(cns, function(cn) dtm[allp, cn] != 0, logical(length(allp)))
+    tm <- matrix(tm, nrow = length(allp), dimnames = list(allp, cns)); sg <- matrix(sg, nrow = length(allp), dimnames = list(allp, cns))
+    is_sig <- rowSums(sg) > 0
+    sig <- allp[is_sig][order(-apply(tm[is_sig, , drop = FALSE] * sg[is_sig, , drop = FALSE], 1, max))]
+    rest <- allp[!is_sig][order(-apply(tm[!is_sig, , drop = FALSE], 1, max))]
+    list(sig = sig, all = c(sig, rest))
+  }
+  picker_inputs <- function(lists_fn) list(
+    sig = reactive(if (is.null(de_res())) character(0) else lists_fn()$sig),
+    all = reactive(if (is.null(de_res())) rownames(final_expr()) else lists_fn()$all))
+
+  # ---- volcano search bar: N <-> bar ----
+  vol_lists <- reactive(ordered_lists(input$vol_contrasts %||% de_res()$single_names))
+  vi <- picker_inputs(vol_lists)
+  vol_picker <- protein_picker_server("pp_vol", sig = vi$sig, all = vi$all)
+  vol_skip <- reactiveVal(NULL)
+  vol_topn <- function(n) {                                    # top n by |t| of every selected volcano
+    r <- de_res(); cns <- intersect(input$vol_contrasts %||% character(0), r$single_names)
+    unique(unlist(lapply(cns, function(cn) { tt <- r$tops[[cn]]; utils::head(tt$Protein[order(-abs(tt$t))], n) })))
+  }
+  observeEvent(list(input$vol_nlab, input$vol_contrasts, de_res(), vol_picker$ready()), {
+    n <- input$vol_nlab; req(de_res())
+    if (is.null(n) || is.na(n) || n < 0) return()
+    if (!is.null(vol_skip()) && identical(as.numeric(n), as.numeric(vol_skip()))) { vol_skip(NULL); return() }   # N was set from the bar
+    vol_picker$set(if (n == 0) character(0) else vol_topn(n))
+  })
+  observeEvent(vol_picker$selected(), {                         # bar -> N (exact with a single volcano selected)
+    if (length(input$vol_contrasts %||% character(0)) != 1) return()
+    len <- length(vol_picker$selected()); n <- input$vol_nlab
+    if (!is.null(n) && !is.na(n) && as.numeric(n) != len) { vol_skip(len); updateNumericInput(session, "vol_nlab", value = len) }
+  }, ignoreInit = TRUE)
+
+  # ---- protein plots ----
+  pp_lists <- reactive(ordered_lists(input$pp_contrasts %||% de_res()$single_names))
+  pi_ <- picker_inputs(pp_lists)
+  pp_picker <- protein_picker_server("pp_de", sig = pi_$sig, all = pi_$all)
+  pp_default <- reactive({                                     # top 2 (largest |t|) of every selected contrast
+    r <- de_res(); req(r); cns <- intersect(input$pp_contrasts %||% r$single_names, r$single_names)
+    unique(unlist(lapply(cns, function(cn) { tt <- r$tops[[cn]]; utils::head(tt$Protein[order(-abs(tt$t))], 2) })))
+  })
+  observeEvent(list(input$pp_contrasts, de_res(), pp_picker$ready()), {    # default: top 2 of each contrast, shown in the bar
+    req(de_res()); pp_picker$set(pp_default())
+  })
+  pp_proteins <- reactive(pp_picker$selected())
+  pp_expr <- reactive(if (corrected_ok()) corrected_expr() else final_expr())      # corrected whenever the design had covariates
+
+  # significance from the limma results (adjusted p of each contrast): plain two-group contrasts get a bracket,
+  # other contrasts (interactions ...) a note under the protein name
+  pp_stats <- reactive({
+    r <- de_res(); req(r); cdf <- r$contrast_df; prot <- pp_proteins(); show_ns <- isTRUE(input$pp_ns)
+    cns <- intersect(input$pp_contrasts %||% r$single_names, r$single_names)
+    star <- function(p) ifelse(p < 0.001, "***", ifelse(p < 0.01, "**", ifelse(p < 0.05, "*", "ns")))
+    br <- list(); nt <- list()
+    for (cn in cns) {
+      row <- cdf[cdf$name == cn, , drop = FALSE]; if (!nrow(row)) next
+      tt <- r$tops[[cn]]; padj <- setNames(tt$adj.P.Val, tt$Protein)[prot]; lab <- star(padj)
+      keep <- !is.na(padj) & (show_ns | lab != "ns"); if (!any(keep)) next
+      mt <- regmatches(row$expr[1], regexec("^\\s*([A-Za-z0-9._]+)\\s*-\\s*([A-Za-z0-9._]+)\\s*$", row$expr[1]))[[1]]
+      if (length(mt) == 3) br[[length(br) + 1]] <- data.frame(Protein = prot[keep], g1 = lab_of(mt[3]), g2 = lab_of(mt[2]), label = lab[keep])
+      else nt[[length(nt) + 1]] <- data.frame(Protein = prot[keep], txt = paste0(cn, " ", lab[keep]))
+    }
+    brackets <- if (length(br)) do.call(rbind, br) else NULL
+    notes <- if (length(nt)) { d <- do.call(rbind, nt); vapply(split(d$txt, d$Protein), paste, "", collapse = "; ") } else NULL
+    list(brackets = brackets, notes = notes, n_brk = if (is.null(brackets)) 0 else max(table(brackets$Protein)))
+  })
+  pp_obj <- reactive({
+    validate(need(length(pp_proteins()) > 0, "Select proteins in the search bar."))
+    st <- pp_stats()
+    p <- protein_plot_grid(pp_expr(), pp_proteins(), sample_meta(), input$pp_type %||% "boxplot",
+                           input$pp_ncol %||% 4, isTRUE(input$pp_free %||% TRUE), group_colors_all(),
+                           brackets = st$brackets, notes = st$notes)
+    validate(need(length(pp_proteins()) > 0, "Select proteins in the search bar."), need(!is.null(p), "None of the selected proteins is in the data."))
+    p
+  })
+  pp_h <- function() protein_plot_height(length(pp_proteins()), input$pp_ncol %||% 4, tryCatch(pp_stats()$n_brk, error = function(e) 0))
+  output$pp_plot <- renderPlot(pp_obj(), res = 100, height = function() tryCatch(pp_h(), error = function(e) 400))
+  output$dl_pp <- downloadHandler(filename = function() "protein_plots.png",
+    content = function(file) {
+      nc <- input$pp_ncol %||% 4; n <- length(pp_proteins())
+      ggplot2::ggsave(file, pp_obj(), width = 3.3 * min(nc, max(n, 1)), height = pp_h() / 100 * 1.05,
+                      dpi = 300, bg = "white", limitsize = FALSE)
+    })
 
   de_design <- reactive({
     d <- tryCatch(build_design(de_meta(), input$de_covs %||% character(0)),
@@ -265,6 +368,9 @@
                            lfc = log2(input$de_fc), dt_method = input$dt_method,
                            adjust.method = input$dt_adjust, p.value = input$dt_p,
                            progress = function(m) setProgress(detail = m)))
+      res$covs <- input$de_covs %||% character(0)             # covariates of this design (for the corrected data)
+      res$lfc <- log2(input$de_fc)                              # fold-change threshold of this run (volcano plots)
+      res$contrast_df <- cdf                                   # contrasts of this run (for the protein-plot significance)
       de_res(res)
       updateTabsetPanel(session, "de_tabs", selected = "Results")
       showNotification("Differential analysis finished.", type = "message")
@@ -330,46 +436,42 @@
     tagList(
       downloadButton("dl_de_all", "All contrasts (CSV)"),
       hr(), h4("Volcano plots"),
-      fluidRow(
-        column(3, tags$label("Contrasts"), br(),
-               shinyWidgets::dropdownButton(
-                 label = "Select contrasts", circle = FALSE, status = "default", inline = TRUE,
-                 checkboxGroupInput("vol_contrasts", NULL, choices = cn, selected = cn))),
-        column(2, selectInput("vol_filter", "Significance on", c("adj.P.Val", "P.Value"))),
-        column(2, selectInput("vol_y", "Y axis", c("P.Value", "adj.P.Val"))),
-        column(2, numericInput("vol_lfc", "|log2FC| cutoff", lfc0, min = 0, step = 0.05)),
-        column(3, numericInput("vol_p", "p cutoff", isolate(input$dt_p), min = 0, max = 1, step = 0.01))),
-      fluidRow(
-        column(2, numericInput("vol_nlab", "Number of labels", 10, min = 0, step = 1)),
-        column(2, selectInput("vol_which", "Label which", c("all", "up", "down"))),
-        column(2, numericInput("vol_label_size", "Label size", 2.5, min = 1, max = 8, step = 0.5)),
-        column(2, br(), checkboxInput("vol_grid", "Grid lines", FALSE)),
-        column(4, selectizeInput("vol_highlight", "Search / highlight proteins",
-                                 choices = rownames(de_res()$dt), multiple = TRUE,
-                                 options = list(maxOptions = 100, placeholder = "type a protein name...")))),
+      ctl_row(
+        ctl_dd("Contrasts", checkboxGroupInput("vol_contrasts", NULL, choices = cn, selected = cn)),
+        selectInput("vol_y", "Y axis", c("adj.P.Val", "P.Value"), selected = "adj.P.Val", width = fit_w("Y axis", c("adj.P.Val", "P.Value"))),
+        numericInput("vol_nlab", "Number of labels", 5, min = 0, step = 1, width = fit_w("Number of labels", "10")),
+        numericInput("vol_label_size", "Label size", 2.5, min = 1, max = 8, step = 0.5, width = fit_w("Label size", "2.5")),
+        checkboxInput("vol_grid", "Grid lines", FALSE)),
+      protein_picker_ui("pp_vol", "Search / highlight proteins (the labelled proteins; the number above fills this bar)"),
       uiOutput("volcano_cards"),
+      hr(), h4("Protein plots"),
+      ctl_row(
+        ctl_dd("Contrasts", checkboxGroupInput("pp_contrasts", NULL, choices = cn, selected = cn)),
+        selectInput("pp_type", "Plot type", PROTEIN_PLOT_TYPES, width = fit_w("Plot type", names(PROTEIN_PLOT_TYPES))),
+        numericInput("pp_ncol", "Subplots per row", 4, min = 1, max = 8, width = fit_w("Subplots per row", "4")),
+        checkboxInput("pp_free", "Free y-axis", TRUE),
+        checkboxInput("pp_ns", "show ns", FALSE)),
+      protein_picker_ui("pp_de", "Proteins to plot (the top 2 of every selected contrast are selected by default)"),
+      plotOutput("pp_plot", height = "auto"), downloadButton("dl_pp", "PNG"),
       hr(), h4("Differentially expressed proteins per contrast"),
-      fluidRow(column(3, tags$label("Comparisons"), br(),
-                      shinyWidgets::dropdownButton(label = "Select comparisons", circle = FALSE, status = "default", inline = TRUE,
-                                                   checkboxGroupInput("bar_contrasts", NULL, choices = cn, selected = cn))),
-               column(3, checkboxInput("bar_labels", "Show contrast names", TRUE)),
-               column(3, numericInput("bar_num_size", "Count font size (pt)", 12, min = 4, max = 30)),
-               column(3, br(), downloadButton("dl_bar", "Download PNG"))),
+      ctl_row(
+        ctl_dd("Comparisons", checkboxGroupInput("bar_contrasts", NULL, choices = cn, selected = cn), btn = "Select comparisons"),
+        checkboxInput("bar_labels", "Show contrast names", TRUE),
+        numericInput("bar_num_size", "Count font size (pt)", 12, min = 4, max = 30, width = fit_w("Count font size (pt)", "12")),
+        div(style = "margin-bottom:15px;", downloadButton("dl_bar", "Download PNG"))),
       plotOutput("deg_bar", height = "360px"),
       hr(), h4("Venn diagram of significant proteins"),
-      fluidRow(
-        column(4, tags$label("Contrasts"), br(),
-               shinyWidgets::dropdownButton(label = "Select contrasts", circle = FALSE, status = "default", inline = TRUE,
-                 checkboxGroupInput("venn_sig_contrasts", NULL, choices = cn_all,
-                                    selected = cn[seq_len(min(2, length(cn)))]),
-                 helpText("Pick 2-7 contrasts, or ONE F-test: it is shown as the contrasts it combines.",
-                          "Choosing an F-test unticks the others and vice versa."))),
-        column(3, radioButtons("venn_sig_dir", "Direction", c("either", "up", "down")))),
-      fluidRow(
-        column(3, sliderInput("vs_font", "Overall font scale", 0.5, 3, 1, step = 0.1)),
-        column(3, numericInput("vs_count", "Number size (blank = auto)", NA, min = 1, step = 0.5)),
-        column(3, numericInput("vs_label", "Contrast-name size (blank = auto)", NA, min = 1, step = 0.5)),
-        column(3, sliderInput("vs_ratio", "Circle size vs numbers (higher = smaller circles)", 1, 3, 1.5, step = 0.1))),
+      ctl_row(
+        ctl_dd("Contrasts", checkboxGroupInput("venn_sig_contrasts", NULL, choices = cn_all,
+                                               selected = cn[seq_len(min(2, length(cn)))]),
+               helpText("Pick 2-7 contrasts, or ONE F-test: it is shown as the contrasts it combines.",
+                        "Choosing an F-test unticks the others and vice versa.")),
+        radioButtons("venn_sig_dir", "Direction", c("either", "up", "down"), inline = TRUE)),
+      ctl_row(
+        sliderInput("vs_font", "Overall font scale", 0.5, 3, 1, step = 0.1, width = "190px"),
+        numericInput("vs_count", "Number size (blank = auto)", NA, min = 1, step = 0.5, width = fit_w("Number size (blank = auto)", "5")),
+        numericInput("vs_label", "Contrast-name size (blank = auto)", NA, min = 1, step = 0.5, width = fit_w("Contrast-name size (blank = auto)", "5")),
+        sliderInput("vs_ratio", "Circle size vs numbers (higher = smaller circles)", 1, 3, 1.5, step = 0.1, width = "250px")),
       uiOutput("vs_titles_ui"),
       uiOutput("venn_note"),
       plotOutput("venn_sig_plot", height = "520px"),
@@ -394,22 +496,19 @@
   })
 
   volcano_plot <- function(i) {
-    req(de_res(), input$vol_filter, input$vol_y, input$vol_lfc, input$vol_p)
-    nl <- input$vol_nlab %||% 0
-    volcano_from_top(de_res()$tops[[i]], title = names(de_res()$tops)[i],
-                     filter_choice = input$vol_filter, y_axis_choice = input$vol_y,
-                     l2FC_thresh = input$vol_lfc, p_thresh = input$vol_p,
-                     show_names = if (is.na(nl) || nl <= 0) "none" else nl,
-                     highlight = input$vol_highlight %||% character(0),
-                     which_genes = input$vol_which, grid_lines = isTRUE(input$vol_grid),
-                     label_size = input$vol_label_size)
+    r <- de_res(); req(r, input$vol_y)
+    volcano_from_top(r$tops[[i]], title = names(r$tops)[i],
+                     filter_choice = "adj.P.Val", y_axis_choice = input$vol_y,
+                     l2FC_thresh = r$lfc %||% log2(1.2), p_thresh = r$p_value %||% 0.05,   # the thresholds of the DE run
+                     genes = vol_picker$selected(),            # the bar proteins are THE labels: boxed, coloured by side
+                     grid_lines = isTRUE(input$vol_grid), label_size = input$vol_label_size)
   }
 
   observeEvent(de_res(), {
     for (i in seq_along(de_res()$tops)) local({
       ii <- i
       output[[paste0("vol_plot_", ii)]] <- renderPlot(volcano_plot(ii), res = 100)
-      output[[paste0("vol_tbl_", ii)]] <- renderTable(head(as_names(de_res()$tops[[ii]]), 300), digits = 4)
+      output[[paste0("vol_tbl_", ii)]] <- renderTable({ tt <- de_res()$tops[[ii]]; head(as_names(tt[order(-abs(tt$t)), ]), 300) }, digits = 4)
       output[[paste0("vol_dl_", ii)]] <- downloadHandler(
         filename = function() paste0("Volcano_", names(de_res()$tops)[ii], ".png"),
         content = function(file) ggplot2::ggsave(file, volcano_plot(ii), width = 6.5, height = 5.8, dpi = 300))

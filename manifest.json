@@ -150,11 +150,11 @@
         "Maintainer": "Marcel Ramos <marcel.ramos@sph.cuny.edu>",
         "Repository": "CRAN",
         "Date/Publication": "2025-11-14 08:30:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 02:21:16 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 02:04:02 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "BiocManager",
         "RemoteRef": "BiocManager",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.30.27"
       }
     },
@@ -413,11 +413,11 @@
         "Maintainer": "Garrick Aden-Buie <garrick@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2025-09-02 22:00:06 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 05:02:39 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:54:20 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "DT",
         "RemoteRef": "DT",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.34.0"
       }
     },
@@ -519,6 +519,33 @@
         "GithubSubdir": "Code",
         "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-23 10:44:37 UTC; windows",
         "Archs": "x64"
+      }
+    },
+    "EnvStats": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "EnvStats",
+        "Type": "Package",
+        "Title": "Package for Environmental Statistics, Including US EPA Guidance",
+        "Version": "3.1.0",
+        "Date": "2025-04-17",
+        "Authors@R": "c(\n  person(\"Steven P.\",\"Millard\",email=\"EnvStats@ProbStatInfo.com\",role=c(\"aut\")),\n  person(\"Alexander\", \"Kowarik\", email = \"alexander.kowarik@statistik.gv.at\", role = c(\"ctb\",\"cre\"),\n    comment=c(ORCID=\"0000-0001-8598-4130\")))",
+        "Depends": "R (>= 3.5.0)",
+        "Imports": "MASS, ggplot2, nortest",
+        "Suggests": "lattice, qcc, sp, boot, tinytest, covr, Hmisc",
+        "Description": "Graphical and statistical analyses of environmental data, with \n  focus on analyzing chemical concentrations and physical parameters, usually in \n  the context of mandated environmental monitoring.  Major environmental \n  statistical methods found in the literature and regulatory guidance documents, \n  with extensive help that explains what these methods do, how to use them, \n  and where to find them in the literature.  Numerous built-in data sets from \n  regulatory guidance documents and environmental statistics literature.  Includes \n  scripts reproducing analyses presented in the book \"EnvStats:  An R Package for \n  Environmental Statistics\" (Millard, 2013, Springer, ISBN 978-1-4614-8455-4, \n  <doi:10.1007/978-1-4614-8456-1>).",
+        "License": "GPL (>= 3)",
+        "URL": "https://github.com/alexkowa/EnvStats,\nhttps://alexkowa.github.io/EnvStats/",
+        "LazyLoad": "yes",
+        "LazyData": "yes",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-04-24 05:09:48 UTC; alex",
+        "Author": "Steven P. Millard [aut],\n  Alexander Kowarik [ctb, cre] (<https://orcid.org/0000-0001-8598-4130>)",
+        "Maintainer": "Alexander Kowarik <alexander.kowarik@statistik.gv.at>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-04-24 12:00:07 UTC",
+        "Built": "R 4.6.1; ; 2026-06-25 02:32:40 UTC; windows"
       }
     },
     "Formula": {
@@ -844,12 +871,12 @@
         "Maintainer": "Brian Ripley <Brian.Ripley@R-project.org>",
         "Repository": "CRAN",
         "Date/Publication": "2026-07-15 10:58:26 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 02:19:45 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 02:02:11 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "MASS",
         "RemoteRef": "MASS",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "7.3-66"
       }
     },
@@ -1061,7 +1088,7 @@
         "RemoteType": "standard",
         "RemotePkgRef": "RColorBrewer",
         "RemoteRef": "RColorBrewer",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.1-3"
       }
     },
@@ -1335,6 +1362,28 @@
         "RemoteSha": "2.6.6"
       }
     },
+    "RhpcBLASctl": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "RhpcBLASctl",
+        "Version": "0.23-42",
+        "Date": "2023-02-11",
+        "Title": "Control the Number of Threads on 'BLAS'",
+        "Author": "Junji NAKANO <nakanoj@ism.ac.jp> and Ei-ji Nakama <nakama@ki.rim.or.jp>",
+        "Maintainer": "Ei-ji Nakama <nakama@ki.rim.or.jp>",
+        "Description": "Control the number of threads on 'BLAS' (Aka 'GotoBLAS', 'OpenBLAS', 'ACML', 'BLIS' and 'MKL').\n  And possible to control the number of threads in 'OpenMP'.\n  Get a number of logical cores and physical cores if feasible.",
+        "License": "AGPL-3",
+        "URL": "https://prs.ism.ac.jp/~nakama/Rhpc/",
+        "ByteCompile": "true",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-02-11 00:17:46 UTC; nakama",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-02-11 01:00:02 UTC",
+        "Built": "R 4.6.0; x86_64-w64-mingw32; 2026-04-21 00:47:38 UTC; windows",
+        "Archs": "x64"
+      }
+    },
     "S4Arrays": {
       "Source": "Bioconductor",
       "Repository": "https://bioconductor.org/packages/3.23/bioc",
@@ -1592,13 +1641,38 @@
         "Author": "Matthias Templ [aut, cre],\n  Alexander Kowarik [aut] (ORCID:\n    <https://orcid.org/0000-0001-8598-4130>),\n  Andreas Alfons [aut],\n  Johannes Gussenbauer [aut],\n  Nina Niederhametner [aut],\n  Eileen Vattheuer [aut],\n  Gregor de Cillia [aut],\n  Bernd Prantner [ctb],\n  Wolfgang Rannetbauer [aut]",
         "Maintainer": "Matthias Templ <matthias.templ@gmail.com>",
         "Date/Publication": "2026-09-11 07:50:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 04:01:53 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:48:13 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "VIM",
         "RemoteRef": "VIM",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "7.3.1"
+      }
+    },
+    "XML": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "XML",
+        "Version": "3.99-0.23",
+        "Authors@R": "c(person(\"CRAN Team\", role = \"ctb\",\n                    email = \"CRAN@r-project.org\",\n                    comment = \"de facto maintainer in 2013-2026\"),\n             person(\"Duncan\", \"Temple Lang\", role = \"aut\",\n                    email = \"duncan@r-project.org\",\n                    comment = c(ORCID = \"0000-0003-0159-1546\")),\n             person(\"Tomas\", \"Kalibera\", role = \"ctb\"),\n             person(\"Ivan\", \"Krylov\", email = \"ikrylov@disroot.org\",\n                    role = \"cre\"))",
+        "Title": "Tools for Parsing and Generating XML Within R and S-Plus",
+        "Depends": "R (>= 4.0.0), methods, utils",
+        "Suggests": "bitops, RCurl",
+        "SystemRequirements": "libxml2 (>= 2.6.3)",
+        "Description": "Many approaches for both reading and\n        creating XML (and HTML) documents (including DTDs), both local\n        and accessible via HTTP or FTP.  Also offers access to an\n        'XPath' \"interpreter\".",
+        "BugReports": "https://codeberg.org/aitap/XML/issues",
+        "License": "BSD_3_clause + file LICENSE",
+        "Collate": "AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R\napplyDOM.R assignChild.R catalog.R createNode.R dynSupports.R\nerror.R flatTree.R nodeAccessors.R parseDTD.R schema.R\nsummary.R tangle.R toString.R tree.R version.R xmlErrorEnums.R\nxmlEventHandler.R xmlEventParse.R xmlHandler.R\nxmlInternalSource.R xmlOutputDOM.R xmlNodes.R xmlOutputBuffer.R\nxmlTree.R xmlTreeParse.R htmlParse.R hashTree.R zzz.R\nsupports.R parser.R libxmlFeatures.R xmlString.R saveXML.R\nnamespaces.R readHTMLTable.R reflection.R xmlToDataFrame.R\nbitList.R compare.R encoding.R fixNS.R xmlRoot.R serialize.R\nxmlMemoryMgmt.R keyValueDB.R solrDocs.R XMLRErrorInfo.R\nxincludes.R namespaceHandlers.R tangle1.R htmlLinks.R\nhtmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R\nsimplifyPath.R",
+        "NeedsCompilation": "yes",
+        "Packaged": "2026-03-19 18:59:15 UTC; aitap",
+        "Author": "CRAN Team [ctb] (de facto maintainer in 2013-2026),\n  Duncan Temple Lang [aut] (ORCID:\n    <https://orcid.org/0000-0003-0159-1546>),\n  Tomas Kalibera [ctb],\n  Ivan Krylov [cre]",
+        "Maintainer": "Ivan Krylov <ikrylov@disroot.org>",
+        "Repository": "CRAN",
+        "Date/Publication": "2026-03-20 06:11:24 UTC",
+        "Built": "R 4.6.0; x86_64-w64-mingw32; 2026-06-04 01:26:52 UTC; windows",
+        "Archs": "x64"
       }
     },
     "XVector": {
@@ -1778,6 +1852,60 @@
         "Built": "R 4.6.1; ; 2026-06-25 02:31:03 UTC; windows"
       }
     },
+    "annotate": {
+      "Source": "Bioconductor",
+      "Repository": "https://bioconductor.org/packages/3.23/bioc",
+      "description": {
+        "Package": "annotate",
+        "Title": "Annotation for microarrays",
+        "Version": "1.90.0",
+        "Author": "R. Gentleman",
+        "Authors@R": "c(\n        person(\"Jeff\", \"Gentry\", role = \"aut\"),\n        person(\"Kritika\", \"Verma\", role = \"ctb\",\n                comment = \"Converted chromLOC vignette from Sweave to RMarkdown / HTML.\"),\n        person(\"Manvi\", \"Yaduvanshi\", role = \"ctb\",\n                comment = \"Converted useDataPkgs vignette from Sweave to RMarkdown / HTML.\"),\n        person(\"Bioconductor Package Maintainer\",\n                email = \"maintainer@bioconductor.org\", role = \"cre\"))",
+        "Description": "Using R enviroments for annotation.",
+        "Depends": "R (>= 2.10), AnnotationDbi (>= 1.27.5), XML",
+        "Imports": "Biobase, DBI, xtable, graphics, utils, stats, methods,\nBiocGenerics (>= 0.13.8), httr",
+        "Suggests": "hgu95av2.db, genefilter, Biostrings (>= 2.25.10), IRanges,\nrae230a.db, rae230aprobe, tkWidgets, GO.db, org.Hs.eg.db,\norg.Mm.eg.db, humanCHRLOC, Rgraphviz, RUnit, BiocStyle, knitr",
+        "VignetteBuilder": "knitr",
+        "License": "Artistic-2.0",
+        "LazyLoad": "yes",
+        "Collate": "AllGenerics.R ACCNUMStats.R Amat.R AnnMaps.R chromLocation.R\ncompatipleVersions.R findNeighbors.R getData.R getPMInfo.R\ngetSeq4ACC.R GOhelpers.R homoData.R html.R isValidKey.R\nLL2homology.R pmid2MIAME.R pubMedAbst.R query.R readGEOAnn.R\nserializeEnv.R blastSequences.R zzz.R test_annotate_package.R",
+        "biocViews": "Annotation, Pathways, GO",
+        "Packaged": "2026-04-29 13:02:31 UTC; root",
+        "Config/pak/sysreqs": "libpng-dev libxml2-dev libssl-dev zlib1g-dev",
+        "Repository": "https://bioc-release.r-universe.dev",
+        "Date/Publication": "2026-04-28 12:29:54 UTC",
+        "RemoteUrl": "https://github.com/bioc/annotate",
+        "RemoteRef": "RELEASE_3_23",
+        "RemoteSha": "d5d12367bcb89faaee04b79471f3285504a1faa6",
+        "NeedsCompilation": "no",
+        "Maintainer": "Bioconductor Package Maintainer <maintainer@bioconductor.org>",
+        "Built": "R 4.6.0; ; 2026-04-29 13:05:05 UTC; windows"
+      }
+    },
+    "aod": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "aod",
+        "Version": "1.3.3",
+        "Date": "2012-04-10",
+        "Title": "Analysis of Overdispersed Data",
+        "Author": "Matthieu Lesnoff <matthieu.lesnoff@cirad.fr> and Renaud\n        Lancelot <renaud.lancelot@cirad.fr>",
+        "Maintainer": "Renaud Lancelot <renaud.lancelot@cirad.fr>",
+        "Depends": "R (>= 2.10), methods, stats",
+        "Suggests": "MASS, boot, lme4",
+        "Description": "Provides a set of functions to analyse\n        overdispersed counts or proportions. Most of the methods are\n        already available elsewhere but are scattered in different\n        packages. The proposed functions should be considered as\n        complements to more sophisticated methods such as generalized\n        estimating equations (GEE) or generalized linear mixed effect\n        models (GLMM).",
+        "License": "GPL (>= 2)",
+        "URL": "https://cran.r-project.org/package=aod",
+        "LazyData": "yes",
+        "Encoding": "UTF-8",
+        "Packaged": "2023-12-11 19:52:10 UTC; hornik",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-12-13 17:27:45 UTC",
+        "NeedsCompilation": "no",
+        "Built": "R 4.6.1; ; 2026-06-25 01:01:54 UTC; windows"
+      }
+    },
     "ape": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -1923,7 +2051,7 @@
         "RemoteType": "standard",
         "RemotePkgRef": "base64enc",
         "RemoteRef": "base64enc",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.1-6"
       }
     },
@@ -2241,11 +2369,11 @@
         "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2026-06-05 11:40:13 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:38:44 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:25:22 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "callr",
         "RemoteRef": "callr",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "3.8.0"
       }
     },
@@ -2641,11 +2769,11 @@
         "Maintainer": "Dean Attali <daattali@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2023-08-21 08:12:46 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 05:02:39 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:54:19 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "colourpicker",
         "RemoteRef": "colourpicker",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.3.0"
       }
     },
@@ -2681,6 +2809,29 @@
         "RemoteSha": "2.0.0"
       }
     },
+    "corpcor": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "corpcor",
+        "Version": "1.6.10",
+        "Date": "2021-09-16",
+        "Title": "Efficient Estimation of Covariance and (Partial) Correlation",
+        "Author": "Juliane Schafer, Rainer Opgen-Rhein, Verena Zuber, Miika Ahdesmaki, \n A. Pedro Duarte Silva, and Korbinian Strimmer.",
+        "Maintainer": "Korbinian Strimmer <strimmerlab@gmail.com>",
+        "Depends": "R (>= 3.0.2)",
+        "Imports": "stats",
+        "Suggests": "",
+        "Description": "Implements a James-Stein-type shrinkage estimator for \n  the covariance matrix, with separate shrinkage for variances and correlations.  \n  The details of the method are explained in Schafer and Strimmer (2005) \n  <DOI:10.2202/1544-6115.1175> and Opgen-Rhein and Strimmer (2007) \n  <DOI:10.2202/1544-6115.1252>.  The approach is both computationally as well\n  as statistically very efficient, it is applicable to \"small n, large p\" data, \n  and always returns a positive definite and well-conditioned covariance matrix.  \n  In addition to inferring the covariance matrix the package also provides \n  shrinkage estimators for partial correlations and partial variances.  \n  The inverse of the covariance and correlation matrix \n  can be efficiently computed, as well as any arbitrary power of the \n  shrinkage correlation matrix.  Furthermore, functions are available for fast \n  singular value decomposition, for computing the pseudoinverse, and for \n  checking the rank and positive definiteness of a matrix.",
+        "License": "GPL (>= 3)",
+        "URL": "https://strimmerlab.github.io/software/corpcor/",
+        "NeedsCompilation": "no",
+        "Packaged": "2021-09-16 14:05:52 UTC; strimmer",
+        "Repository": "CRAN",
+        "Date/Publication": "2021-09-16 15:30:08 UTC",
+        "Built": "R 4.6.0; ; 2026-04-21 00:43:10 UTC; windows"
+      }
+    },
     "cowplot": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -2706,11 +2857,11 @@
         "Maintainer": "Claus O. Wilke <wilke@austin.utexas.edu>",
         "Repository": "CRAN",
         "Date/Publication": "2025-07-07 19:00:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 04:23:21 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:13:16 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "cowplot",
         "RemoteRef": "cowplot",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.2.0"
       }
     },
@@ -2871,12 +3022,12 @@
         "Maintainer": "Tyson Barrett <t.barrett88@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2026-08-24 08:40:13 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 02:19:47 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 02:02:15 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "data.table",
         "RemoteRef": "data.table",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.18.6.1"
       }
     },
@@ -3034,12 +3185,12 @@
         "Maintainer": "Hadley Wickham <hadley@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2026-04-03 07:30:08 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 04:40:17 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-21 03:38:36 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "dplyr",
         "RemoteRef": "dplyr",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.2.1"
       }
     },
@@ -3069,6 +3220,35 @@
         "RemoteRef": "e1071",
         "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.7-17"
+      }
+    },
+    "edgeR": {
+      "Source": "Bioconductor",
+      "Repository": "https://bioconductor.org/packages/3.23/bioc",
+      "description": {
+        "Package": "edgeR",
+        "Version": "4.10.1",
+        "Date": "2026-05-23",
+        "Title": "Empirical Analysis of Digital Gene Expression Data in R",
+        "Description": "Differential expression analysis of sequence count data.\n        Implements a range of statistical methodology based on the\n        negative binomial distributions, including empirical Bayes\n        estimation, exact tests, generalized linear models,\n        quasi-likelihood, and gene set enrichment. Can perform\n        differential analyses of any type of omics data that produces\n        read counts, including RNA-seq, ChIP-seq, ATAC-seq,\n        Bisulfite-seq, SAGE, CAGE, metabolomics, or proteomics spectral\n        counts. RNA-seq analyses can be conducted at the gene or\n        isoform level, and tests can be conducted for differential exon\n        or transcript usage.",
+        "Author": "Yunshun Chen, Lizhong Chen, Aaron TL Lun, Davis J McCarthy,\n        Pedro Baldoni, Matthew E Ritchie, Belinda Phipson, Yifang Hu,\n        Xiaobei Zhou, Mark D Robinson, Gordon K Smyth",
+        "Maintainer": "Yunshun Chen <yuchen@wehi.edu.au>, Gordon Smyth\n<smyth@wehi.edu.au>, Aaron Lun\n<infinite.monkeys.with.keyboards@gmail.com>, Mark Robinson\n<mark.robinson@imls.uzh.ch>",
+        "License": "GPL (>=2)",
+        "Depends": "R (>= 3.6.0), limma (>= 3.63.6)",
+        "Imports": "methods, graphics, stats, utils, locfit",
+        "Suggests": "jsonlite, knitr, Matrix, nanoparquet, readr, rhdf5,\nSeuratObject, splines, AnnotationDbi, Biobase, BiocStyle,\norg.Hs.eg.db, S4Vectors, SummarizedExperiment",
+        "VignetteBuilder": "knitr",
+        "URL": "https://bioinf.wehi.edu.au/edgeR/,\nhttps://bioconductor.org/packages/edgeR",
+        "biocViews": "AlternativeSplicing, BatchEffect, Bayesian,\nBiomedicalInformatics, CellBiology, ChIPSeq, Clustering,\nCoverage, DifferentialExpression, DifferentialMethylation,\nDifferentialSplicing, DNAMethylation, Epigenetics,\nFunctionalGenomics, GeneExpression, GeneSetEnrichment,\nGenetics, Genetics, ImmunoOncology, MultipleComparison,\nNormalization, Pathways, Proteomics, QualityControl,\nRegression, RNASeq, SAGE, Sequencing, SingleCell,\nSystemsBiology, TimeCourse, Transcription, Transcriptomics",
+        "NeedsCompilation": "yes",
+        "Repository": "https://bioc-release.r-universe.dev",
+        "Date/Publication": "2026-05-23 03:30:36 UTC",
+        "RemoteUrl": "https://github.com/bioc/edgeR",
+        "RemoteRef": "RELEASE_3_23",
+        "RemoteSha": "5a71e43e4c203bf14f0201e9151d4fcfd00e8f0d",
+        "Packaged": "2026-05-23 06:36:41 UTC; root",
+        "Built": "R 4.6.0; x86_64-w64-mingw32; 2026-05-23 06:38:53 UTC; windows",
+        "Archs": "x64"
       }
     },
     "enrichit": {
@@ -3162,6 +3342,28 @@
         "RemoteRef": "evaluate",
         "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.0.5"
+      }
+    },
+    "fANCOVA": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "fANCOVA",
+        "Title": "Nonparametric Analysis of Covariance",
+        "Version": "0.6-1",
+        "Authors@R": "c( \n    person(given = \"Xiaofeng\",\n           family = \"Wang\",\n           role = c(\"aut\", \"cre\"),\n           email = \"wangx6@ccf.org\"),\n    person(given = \"Xinge\",\n           family = \"Ji\",\n           role = c(\"ctb\"),\n           email = \"jix@ccf.org\"))",
+        "Description": "A collection of R functions to perform nonparametric \n    analysis of covariance for regression curves or surfaces. \n    Testing the equality or parallelism of nonparametric curves \n    or surfaces is equivalent to analysis of variance (ANOVA) or \n    analysis of covariance (ANCOVA) for one-sample functional data. \n    Three different testing methods are available in the package, \n    including one based on L-2 distance, one based on an ANOVA \n    statistic, and one based on variance estimators.",
+        "License": "GPL-3",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.1.1",
+        "NeedsCompilation": "no",
+        "Packaged": "2020-11-12 23:45:18 UTC; jix",
+        "Author": "Xiaofeng Wang [aut, cre],\n  Xinge Ji [ctb]",
+        "Maintainer": "Xiaofeng Wang <wangx6@ccf.org>",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-11-13 16:40:02 UTC",
+        "Built": "R 4.6.0; ; 2026-04-21 00:55:38 UTC; windows"
       }
     },
     "farver": {
@@ -3669,6 +3871,37 @@
         "Archs": "x64"
       }
     },
+    "genefilter": {
+      "Source": "Bioconductor",
+      "Repository": "https://bioconductor.org/packages/3.23/bioc",
+      "description": {
+        "Package": "genefilter",
+        "Title": "genefilter: methods for filtering genes from high-throughput\nexperiments",
+        "Version": "1.94.0",
+        "Authors@R": "c(\n        person(\"Robert\", \"Gentleman\", role = \"aut\"),\n        person(\"Vincent J.\", \"Carey\", role = \"aut\"),\n        person(\"Wolfgang\", \"Huber\", role = \"aut\"),\n        person(\"Florian\", \"Hahne\", role = \"aut\"),\n        person(\"Emmanuel\", \"Taiwo\", role = \"ctb\",\n                comment = \"'howtogenefinder' vignette translation from Sweave to RMarkdown / HTML.\"),\n        person(\"Khadijah\", \"Amusat\", role = \"ctb\",\n                comment = \"Converted genefilter vignette from Sweave to RMarkdown / HTML.\"),\n        person(\"Bioconductor Package Maintainer\", role = \"cre\",\n                email = \"maintainer@bioconductor.org\"))",
+        "Description": "Some basic functions for filtering genes.",
+        "Suggests": "class, hgu95av2.db, tkWidgets, ALL, ROC, RColorBrewer,\nBiocStyle, knitr",
+        "Imports": "MatrixGenerics (>= 1.11.1), AnnotationDbi, annotate, Biobase,\ngraphics, methods, stats, survival, grDevices",
+        "License": "Artistic-2.0",
+        "LazyLoad": "yes",
+        "LazyData": "yes",
+        "Collate": "AllClasses.R AllGenerics.R all.R dist2.R eSetFilter.R fastT.R\nfilter_volcano.R filtered_p.R genefinder.R half.range.mode.R\nkappa_p.R nsFilter.R rejection_plot.R rowROC-accessors.R\nrowSds.R rowpAUCs-methods.R rowttests-methods.R shorth.R zzz.R",
+        "biocViews": "Microarray",
+        "VignetteBuilder": "knitr",
+        "Config/pak/sysreqs": "libpng-dev libxml2-dev libssl-dev zlib1g-dev",
+        "Repository": "https://bioc-release.r-universe.dev",
+        "Date/Publication": "2026-04-28 12:29:55 UTC",
+        "RemoteUrl": "https://github.com/bioc/genefilter",
+        "RemoteRef": "RELEASE_3_23",
+        "RemoteSha": "68e3734856e6ba61b0681f5c85d15bda2448d1d9",
+        "NeedsCompilation": "yes",
+        "Packaged": "2026-04-29 14:57:07 UTC; root",
+        "Author": "Robert Gentleman [aut],\n  Vincent J. Carey [aut],\n  Wolfgang Huber [aut],\n  Florian Hahne [aut],\n  Emmanuel Taiwo [ctb] ('howtogenefinder' vignette translation from\n    Sweave to RMarkdown / HTML.),\n  Khadijah Amusat [ctb] (Converted genefilter vignette from Sweave to\n    RMarkdown / HTML.),\n  Bioconductor Package Maintainer [cre]",
+        "Maintainer": "Bioconductor Package Maintainer <maintainer@bioconductor.org>",
+        "Built": "R 4.6.0; x86_64-w64-mingw32; 2026-04-29 14:59:23 UTC; windows",
+        "Archs": "x64"
+      }
+    },
     "generics": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -3726,11 +3959,11 @@
         "Author": "Chun-Hui Gao [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-1445-7939>),\n  Guangchuang Yu [ctb] (ORCID: <https://orcid.org/0000-0002-6485-8781>),\n  Adrian Dusa [aut, cph] (ORCID: <https://orcid.org/0000-0002-3525-9253>,\n    note: Adrian Dusa is the author and copyright holder of venn, where\n    ggVennDiagram imports the polygon coordinates enabling 5 - 7 sets\n    Venn diagram.),\n  Turgut Yigit Akyol [ctb] (ORCID:\n    <https://orcid.org/0000-0003-0897-7716>)",
         "Repository": "CRAN",
         "Date/Publication": "2026-01-10 07:51:36 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 05:52:10 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:55:48 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "ggVennDiagram",
         "RemoteRef": "ggVennDiagram",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.5.7"
       }
     },
@@ -3880,11 +4113,11 @@
         "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2026-04-22 09:10:03 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:57:59 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:46:57 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "ggplot2",
         "RemoteRef": "ggplot2",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "4.0.3"
       }
     },
@@ -3941,12 +4174,12 @@
         "Maintainer": "Kamil Slowikowski <kslowikowski@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2026-03-17 08:30:38 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 04:23:26 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 04:13:16 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "ggrepel",
         "RemoteRef": "ggrepel",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.9.8"
       }
     },
@@ -4034,11 +4267,11 @@
         "Packaged": "2025-10-08 08:13:47 UTC; yanll",
         "Repository": "CRAN",
         "Date/Publication": "2025-10-08 13:30:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 04:47:41 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:39:43 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "ggvenn",
         "RemoteRef": "ggvenn",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.1.19"
       }
     },
@@ -4191,11 +4424,11 @@
         "Repository": "CRAN",
         "Date/Publication": "2025-11-11 08:20:02 UTC",
         "Author": "Liis Kolberg [aut, cre],\n  Uku Raudvere [aut]",
-        "Built": "R 4.6.1; ; 2026-10-18 05:22:55 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 05:17:13 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "gprofiler2",
         "RemoteRef": "gprofiler2",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.2.4"
       }
     },
@@ -4633,11 +4866,11 @@
         "Maintainer": "Hadley Wickham <hadley@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2026-09-01 13:20:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:57:53 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:46:59 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "httr",
         "RemoteRef": "httr",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.4.9"
       }
     },
@@ -4763,11 +4996,11 @@
         "RoxygenNote": "7.2.0",
         "Encoding": "UTF-8",
         "Author": "Cosmin Lazar [aut],\n  Thomas Burger [aut],\n  Samuel Wieczorek [cre, ctb]",
-        "Built": "R 4.6.1; ; 2026-10-18 04:40:12 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:05:09 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "imputeLCMD",
         "RemoteRef": "imputeLCMD",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "2.1"
       }
     },
@@ -5302,6 +5535,35 @@
         "RemoteSha": "2.0-1"
       }
     },
+    "lmerTest": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "lmerTest",
+        "Type": "Package",
+        "Title": "Tests in Linear Mixed Effects Models",
+        "Version": "3.2-1",
+        "Authors@R": "c(person(\"Alexandra\", \"Kuznetsova\", role = c(\"aut\")),\n                   person(\"Per\", \"Bruun Brockhoff\", role = c(\"aut\", \"ths\")),\n                   person(\"Rune\", \"Haubo Bojesen Christensen\", role =  c(\"aut\", \"cre\"),\n                   email = \"Rune.Haubo@gmail.com\", \n                   comment = c(ORCID = \"0000-0002-4494-3399\")),\n                   person(\"Sofie\", \"Pødenphant Jensen\", role=c(\"ctb\")))",
+        "Depends": "R (>= 3.2.5), lme4 (>= 1.1-10), stats, methods",
+        "Imports": "numDeriv, MASS, ggplot2, reformulas",
+        "Suggests": "pbkrtest (>= 0.4-3), tools",
+        "Description": "Provides p-values in type I, II or III anova and summary tables\n    for lmer model fits (cf. lme4) via Satterthwaite's degrees of freedom method. A\n    Kenward-Roger method is also available via the pbkrtest package. Model selection\n    methods include step, drop1 and anova-like tables for random effects (ranova).\n    Methods for Least-Square means (LS-means) and tests of linear contrasts of fixed\n    effects are also available.",
+        "License": "GPL (>= 2)",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "URL": "https://github.com/runehaubo/lmerTestR",
+        "BugReports": "https://github.com/runehaubo/lmerTestR/issues",
+        "RoxygenNote": "7.3.3",
+        "Collate": "'anova_contrasts.R' 'contest.R' 'contrast_utils.R'\n'data_documentation.R' 'drop1.R' 'estimability.R' 'legacy.R'\n'lmer.R' 'lmerTest.R' 'lmer_anova.R' 'lmer_summary.R'\n'ls_means.R' 'ranova.R' 'step.R' 'terms_utils.R' 'utils.R'",
+        "NeedsCompilation": "no",
+        "Packaged": "2026-03-05 07:48:42 UTC; runechristensen",
+        "Author": "Alexandra Kuznetsova [aut],\n  Per Bruun Brockhoff [aut, ths],\n  Rune Haubo Bojesen Christensen [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-4494-3399>),\n  Sofie Pødenphant Jensen [ctb]",
+        "Maintainer": "Rune Haubo Bojesen Christensen <Rune.Haubo@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2026-03-05 12:20:02 UTC",
+        "Built": "R 4.6.1; ; 2026-06-25 02:51:10 UTC; windows"
+      }
+    },
     "lmtest": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -5330,6 +5592,31 @@
         "RemoteRef": "lmtest",
         "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.9-40"
+      }
+    },
+    "locfit": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "locfit",
+        "Version": "1.5-9.12",
+        "Title": "Local Regression, Likelihood and Density Estimation",
+        "Date": "2025-03-05",
+        "Authors@R": "c(person(\"Catherine\", \"Loader\", role = \"aut\"),\n             person(\"Jiayang\", \"Sun\", role = \"ctb\"),\n             person(\"Lucent Technologies\", role = \"cph\"),\n             person(\"Andy\", \"Liaw\", role = \"cre\", \n                    email=\"andy_liaw@merck.com\"))",
+        "Author": "Catherine Loader [aut],\n  Jiayang Sun [ctb],\n  Lucent Technologies [cph],\n  Andy Liaw [cre]",
+        "Maintainer": "Andy Liaw <andy_liaw@merck.com>",
+        "Description": "Local regression, likelihood and density estimation methods as described in the 1999 book by Loader.",
+        "Depends": "R (>= 4.1.0)",
+        "Imports": "lattice",
+        "Suggests": "interp, gam",
+        "License": "GPL (>= 2)",
+        "SystemRequirements": "USE_C17",
+        "NeedsCompilation": "yes",
+        "Packaged": "2025-03-05 14:42:44 UTC; liawand",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-03-05 15:20:02 UTC",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-06-25 00:57:54 UTC; windows",
+        "Archs": "x64"
       }
     },
     "magrittr": {
@@ -5484,12 +5771,12 @@
         "Author": "Stef van Buuren [aut, cre],\n  Karin Groothuis-Oudshoorn [aut],\n  Gerko Vink [ctb],\n  Rianne Schouten [ctb],\n  Alexander Robitzsch [ctb],\n  Patrick Rockenschaub [ctb],\n  Lisa Doove [ctb],\n  Shahab Jolani [ctb],\n  Margarita Moreno-Betancur [ctb],\n  Ian White [ctb],\n  Philipp Gaffert [ctb],\n  Florian Meinfelder [ctb],\n  Bernie Gray [ctb],\n  Vincent Arel-Bundock [ctb],\n  Mingyang Cai [ctb],\n  Thom Volker [ctb],\n  Edoardo Costantini [ctb],\n  Caspar van Lissa [ctb],\n  Hanne Oberman [ctb],\n  Stephen Wade [ctb],\n  Florian van Leeuwen [ctb],\n  Frederik Fabricius-Bjerre [ctb]",
         "Repository": "CRAN",
         "Date/Publication": "2025-12-10 08:30:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 06:10:12 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 06:04:26 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "mice",
         "RemoteRef": "mice",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "3.19.0"
       }
     },
@@ -5641,11 +5928,11 @@
         "Author": "Daniel J. Stekhoven [aut, cre]",
         "Repository": "CRAN",
         "Date/Publication": "2025-10-26 12:30:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:59:41 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:48:47 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "missForest",
         "RemoteRef": "missForest",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.6.1"
       }
     },
@@ -5889,8 +6176,29 @@
         "RemoteType": "standard",
         "RemotePkgRef": "norm",
         "RemoteRef": "norm",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.0-11.1"
+      }
+    },
+    "nortest": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "nortest",
+        "Title": "Tests for Normality",
+        "Version": "1.0-4",
+        "Date": "2015-07-29",
+        "Description": "Five omnibus tests for testing the composite hypothesis of\n        normality.",
+        "License": "GPL (>= 2)",
+        "Authors@R": "c(person(\"Juergen\", \"Gross\", role = \"aut\", email = \"gross@statistik.tu-dortmund.de\"),\n\tperson(\"Uwe\", \"Ligges\", role = c(\"aut\", \"cre\"), email = \"ligges@statistik.tu-dortmund.de\"))",
+        "Imports": "stats",
+        "Packaged": "2015-07-29 21:51:34 UTC; ligges",
+        "Author": "Juergen Gross [aut],\n  Uwe Ligges [aut, cre]",
+        "Maintainer": "Uwe Ligges <ligges@statistik.tu-dortmund.de>",
+        "NeedsCompilation": "no",
+        "Repository": "CRAN",
+        "Date/Publication": "2015-07-30 00:14:57",
+        "Built": "R 4.6.0; ; 2026-04-21 00:41:36 UTC; windows"
       }
     },
     "numDeriv": {
@@ -5984,12 +6292,12 @@
         "Maintainer": "Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>",
         "Repository": "CRAN",
         "Date/Publication": "2026-09-02 09:30:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 03:38:41 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:25:55 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "openxlsx",
         "RemoteRef": "openxlsx",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "4.2.9"
       }
     },
@@ -6363,12 +6671,12 @@
         "Maintainer": "Jeroen Ooms <jeroenooms@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2026-09-01 10:20:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 03:39:45 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:27:21 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "pdftools",
         "RemoteRef": "pdftools",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "3.9.1"
       }
     },
@@ -7141,12 +7449,12 @@
         "Maintainer": "Jennifer Bryan <jenny@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2026-10-17 07:20:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-17 23:51:57 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 04:32:51 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "readxl",
         "RemoteRef": "readxl",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.6.0"
       }
     },
@@ -7179,6 +7487,38 @@
         "RemoteRef": "reformulas",
         "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.4.4"
+      }
+    },
+    "remaCor": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Type": "Package",
+        "Package": "remaCor",
+        "Title": "Random Effects Meta-Analysis for Correlated Test Statistics",
+        "Version": "0.0.20",
+        "Date": "2025-08-04",
+        "Authors@R": "\n    person(\"Gabriel\", \"Hoffman\", role=c(\"aut\", \"cre\"), email=\"gabriel.hoffman@mssm.edu\", comment=c(ORCID=\"0000-0002-0957-0224\"))",
+        "Description": "Meta-analysis is widely used to summarize estimated effects sizes across multiple statistical tests. Standard fixed and random effect meta-analysis methods assume that the estimated of the effect sizes are statistically independent.  Here we relax this assumption and enable meta-analysis when the correlation matrix between effect size estimates is known.  Fixed effect meta-analysis uses the method of Lin and Sullivan (2009) <doi:10.1016/j.ajhg.2009.11.001>, and random effects meta-analysis uses the method of Han, et al. <doi:10.1093/hmg/ddw049>.",
+        "License": "Artistic-2.0",
+        "URL": "https://diseaseneurogenomics.github.io/remaCor/",
+        "BugReports": "https://github.com/DiseaseNeurogenomics/remaCor/issues",
+        "Suggests": "knitr, RUnit, clusterGeneration, metafor",
+        "Depends": "R (>= 3.6.0), ggplot2, methods",
+        "Imports": "mvtnorm, grid, reshape2, compiler, Rcpp, EnvStats, Rdpack,\nstats",
+        "VignetteBuilder": "knitr",
+        "RdMacros": "Rdpack",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.3.2",
+        "LinkingTo": "Rcpp, RcppArmadillo",
+        "NeedsCompilation": "yes",
+        "Packaged": "2025-08-20 00:53:23 UTC; gabrielhoffman",
+        "Author": "Gabriel Hoffman [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-0957-0224>)",
+        "Maintainer": "Gabriel Hoffman <gabriel.hoffman@mssm.edu>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-08-20 02:40:02 UTC",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-06-25 03:03:36 UTC; windows",
+        "Archs": "x64"
       }
     },
     "rematch": {
@@ -7271,12 +7611,12 @@
         "Maintainer": "Hadley Wickham <hadley@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2025-11-12 06:20:11 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 04:23:16 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 04:13:27 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "reshape2",
         "RemoteRef": "reshape2",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.4.5"
       }
     },
@@ -7572,12 +7912,12 @@
         "Author": "Valentin Todorov [aut, cre] (<https://orcid.org/0000-0003-4215-0245>)",
         "Date/Publication": "2025-04-21 21:50:02 UTC",
         "RoxygenNote": "7.3.2",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 03:38:55 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:25:51 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "rrcov",
         "RemoteRef": "rrcov",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.7-7"
       }
     },
@@ -7604,12 +7944,12 @@
         "Author": "Valentin Todorov [aut, cre] (<https://orcid.org/0000-0003-4215-0245>)",
         "Repository": "CRAN",
         "Date/Publication": "2025-04-22 07:30:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 03:57:05 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:45:23 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "rrcovNA",
         "RemoteRef": "rrcovNA",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.5-3"
       }
     },
@@ -7803,11 +8143,11 @@
         "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2025-04-24 11:00:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:38:41 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:25:08 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "scales",
         "RemoteRef": "scales",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.4.0"
       }
     },
@@ -7888,11 +8228,11 @@
         "Maintainer": "Carson Sievert <carson@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2026-06-21 14:10:08 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 04:23:20 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:13:18 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "shiny",
         "RemoteRef": "shiny",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.14.0"
       }
     },
@@ -7920,11 +8260,11 @@
         "Maintainer": "Victor Perrier <victor.perrier@dreamrs.fr>",
         "Repository": "CRAN",
         "Date/Publication": "2026-03-09 08:30:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 04:40:29 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 04:32:41 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "shinyWidgets",
         "RemoteRef": "shinyWidgets",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "0.9.1"
       }
     },
@@ -8186,11 +8526,11 @@
         "Maintainer": "Hadley Wickham <hadley@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2025-11-04 14:00:02 UTC",
-        "Built": "R 4.6.1; ; 2026-10-18 03:57:55 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-28 03:46:55 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "stringr",
         "RemoteRef": "stringr",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.6.0"
       }
     },
@@ -8219,6 +8559,34 @@
         "Repository": "CRAN",
         "Date/Publication": "2026-01-16 09:00:02 UTC",
         "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-06-24 08:30:55 UTC; windows",
+        "Archs": "x64"
+      }
+    },
+    "sva": {
+      "Source": "Bioconductor",
+      "Repository": "https://bioconductor.org/packages/3.23/bioc",
+      "description": {
+        "Package": "sva",
+        "Title": "Surrogate Variable Analysis",
+        "Version": "3.60.0",
+        "Author": "Jeffrey T. Leek <jtleek@gmail.com>, W. Evan Johnson\n        <wej@bu.edu>, Hilary S. Parker <hiparker@jhsph.edu>, Elana J.\n        Fertig <ejfertig@jhmi.edu>, Andrew E. Jaffe <ajaffe@jhsph.edu>,\n        Yuqing Zhang <zhangyuqing.pkusms@gmail.com>, John D. Storey\n        <jstorey@princeton.edu>, Leonardo Collado Torres\n        <lcolladotor@gmail.com>",
+        "Description": "The sva package contains functions for removing batch\n        effects and other unwanted variation in high-throughput\n        experiment. Specifically, the sva package contains functions\n        for the identifying and building surrogate variables for\n        high-dimensional data sets. Surrogate variables are covariates\n        constructed directly from high-dimensional data (like gene\n        expression/RNA sequencing/methylation/brain imaging data) that\n        can be used in subsequent analyses to adjust for unknown,\n        unmodeled, or latent sources of noise. The sva package can be\n        used to remove artifacts in three ways: (1) identifying and\n        estimating surrogate variables for unknown sources of variation\n        in high-throughput experiments (Leek and Storey 2007 PLoS\n        Genetics,2008 PNAS), (2) directly removing known batch effects\n        using ComBat (Johnson et al. 2007 Biostatistics) and (3)\n        removing batch effects with known control probes (Leek 2014\n        biorXiv). Removing batch effects and using surrogate variables\n        in differential expression analysis have been shown to reduce\n        dependence, stabilize error rate estimates, and improve\n        reproducibility, see (Leek and Storey 2007 PLoS Genetics, 2008\n        PNAS or Leek et al. 2011 Nat. Reviews Genetics).",
+        "Maintainer": "Jeffrey T. Leek <jtleek@gmail.com>, John D. Storey\n<jstorey@princeton.edu>, W. Evan Johnson <wej@bu.edu>",
+        "Depends": "R (>= 3.2), mgcv, genefilter, BiocParallel",
+        "Imports": "matrixStats, stats, graphics, utils, limma, edgeR",
+        "Suggests": "pamr, bladderbatch, BiocStyle, zebrafishRNASeq, testthat",
+        "License": "Artistic-2.0",
+        "biocViews": "ImmunoOncology, Microarray, StatisticalMethod,\nPreprocessing, MultipleComparison, Sequencing, RNASeq,\nBatchEffect, Normalization",
+        "RoxygenNote": "7.0.2",
+        "Config/pak/sysreqs": "libpng-dev libxml2-dev libssl-dev zlib1g-dev",
+        "Repository": "https://bioc-release.r-universe.dev",
+        "Date/Publication": "2026-04-28 12:35:58 UTC",
+        "RemoteUrl": "https://github.com/bioc/sva",
+        "RemoteRef": "RELEASE_3_23",
+        "RemoteSha": "87a4798db8134fd0952a516489dd555545a92d36",
+        "NeedsCompilation": "yes",
+        "Packaged": "2026-04-29 13:04:15 UTC; root",
+        "Built": "R 4.6.0; x86_64-w64-mingw32; 2026-04-29 13:06:14 UTC; windows",
         "Archs": "x64"
       }
     },
@@ -8390,12 +8758,12 @@
         "Maintainer": "Hadley Wickham <hadley@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2025-12-19 09:20:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 05:02:34 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 04:54:21 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "tidyr",
         "RemoteRef": "tidyr",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.3.2"
       }
     },
@@ -8825,6 +9193,41 @@
         "RemoteRef": "utf8",
         "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "1.2.6"
+      }
+    },
+    "variancePartition": {
+      "Source": "Bioconductor",
+      "Repository": "https://bioconductor.org/packages/3.23/bioc",
+      "description": {
+        "Package": "variancePartition",
+        "Type": "Package",
+        "Title": "Quantify and interpret drivers of variation in multilevel gene\nexpression experiments",
+        "Version": "1.42.0",
+        "Date": "2026-03-19",
+        "Authors@R": "person(\"Gabriel\", \"Hoffman\", role=c(\"aut\", \"cre\"), email=\"gabriel.hoffman@mssm.edu\", comment=c(ORCID=\"0000-0002-0957-0224\"))",
+        "Maintainer": "Gabriel E. Hoffman <gabriel.hoffman@mssm.edu>",
+        "Description": "Quantify and interpret multiple sources of biological and\n        technical variation in gene expression experiments. Uses a\n        linear mixed model to quantify variation in gene expression\n        attributable to individual, tissue, time point, or technical\n        variables.  Includes dream differential expression analysis for\n        repeated measures.",
+        "VignetteBuilder": "knitr",
+        "License": "GPL-2",
+        "Encoding": "UTF-8",
+        "URL": "http://bioconductor.org/packages/variancePartition,\nhttps://DiseaseNeuroGenomics.github.io/variancePartition",
+        "BugReports": "https://github.com/DiseaseNeuroGenomics/variancePartition/issues",
+        "Suggests": "BiocStyle, knitr, pander, rmarkdown, edgeR, dendextend,\ntximport, tximportData, ballgown, DESeq2, RUnit, cowplot,\nRfast, zenith, statmod, BiocGenerics, r2glmm, readr",
+        "biocViews": "RNASeq, GeneExpression, GeneSetEnrichment,\nDifferentialExpression, BatchEffect, QualityControl,\nRegression, Epigenetics, FunctionalGenomics, Transcriptomics,\nNormalization, Preprocessing, Microarray, ImmunoOncology,\nSoftware",
+        "Depends": "R (>= 4.3.0), ggplot2, limma (>= 3.62.2), BiocParallel",
+        "Imports": "MASS, pbkrtest (>= 0.4-4), lmerTest, Matrix (>= 1.4.0),\niterators, gplots, corpcor, reformulas, matrixStats,\nRhpcBLASctl, reformulas, reshape2, gtools, remaCor (>= 0.0.15),\nfANCOVA, aod, scales, Rdpack, rlang, lme4 (>= 2.0-1),\ngrDevices, graphics, Biobase, methods, utils, stats",
+        "RoxygenNote": "7.3.3",
+        "RdMacros": "Rdpack",
+        "Config/pak/sysreqs": "cmake make libicu-dev",
+        "Repository": "https://bioc-release.r-universe.dev",
+        "Date/Publication": "2026-04-28 12:41:37 UTC",
+        "RemoteUrl": "https://github.com/bioc/variancePartition",
+        "RemoteRef": "RELEASE_3_23",
+        "RemoteSha": "40803f2e46533c8bb24bd119006fb0af9e808aa8",
+        "NeedsCompilation": "no",
+        "Packaged": "2026-05-04 09:17:45 UTC; root",
+        "Author": "Gabriel Hoffman [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-0957-0224>)",
+        "Built": "R 4.6.0; ; 2026-05-04 09:20:41 UTC; windows"
       }
     },
     "vcd": {
@@ -9318,12 +9721,12 @@
         "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
         "Repository": "CRAN",
         "Date/Publication": "2026-08-04 18:00:02 UTC",
-        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-18 03:24:17 UTC; windows",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-10-28 03:02:15 UTC; windows",
         "Archs": "x64",
         "RemoteType": "standard",
         "RemotePkgRef": "zip",
         "RemoteRef": "zip",
-        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteRepos": "https://cran.rstudio.com",
         "RemoteSha": "3.0.2"
       }
     },
@@ -9363,7 +9766,10 @@
       "checksum": "05bdb783ee6514c8c072e47680af8ff7"
     },
     "app.R": {
-      "checksum": "7041ef6fffa6d2de2c8a5495bbfd4def"
+      "checksum": "9cd2ebcb7979201f92f8ba83ca7f8f22"
+    },
+    "CNAME": {
+      "checksum": "a12693e5d2451e64fddf3aa9877743a0"
     },
     "data/demo_proteins.csv": {
       "checksum": "5fa983f0a2f8c7c6a587d89604e52756"
@@ -9372,7 +9778,7 @@
       "checksum": "0225abec95265e9d2a2476d6efc2e3b9"
     },
     "functions/de_functions.R": {
-      "checksum": "4f65e657090ff6a4e8e0e64884ad1e56"
+      "checksum": "f9fdb64b369659c210e87fb6b15e1289"
     },
     "functions/evaluate_imputation.R": {
       "checksum": "4283e417da5822dc6f474650400e2982"
@@ -9393,13 +9799,13 @@
       "checksum": "0ef00cc55ea94003400215151b299dd2"
     },
     "functions/heatmap_functions.R": {
-      "checksum": "a16660502405f79bf5c71fc4edb0b75f"
+      "checksum": "aafdf93ae8b8b698dd44577ebdd2e8bb"
     },
     "functions/helpers.R": {
-      "checksum": "b12ae274da6101a41efcfb93a469a910"
+      "checksum": "fd964e57aa22a92cd1e470370b360a06"
     },
     "functions/my_custom_gpro_dotplot.R": {
-      "checksum": "b3ac54b9cd9202fb746722fa7f1631db"
+      "checksum": "0aeaf500e157de75d1e27039d629e297"
     },
     "functions/my_volcano_plot_proteomics.R": {
       "checksum": "f8ba3ee55788c2f6990e77478ac1d4c0"
@@ -9411,7 +9817,13 @@
       "checksum": "5fa9671541f71a6be74a9649a30ade44"
     },
     "functions/PCA_plot.R": {
-      "checksum": "87a7dc0c2554ca63b0e85e21f3c4e999"
+      "checksum": "d0dddc07c753b9ab204b6aff375bf221"
+    },
+    "functions/protein_picker.R": {
+      "checksum": "428197d711c5c5fd4c1d91b24f04cd26"
+    },
+    "functions/protein_plots.R": {
+      "checksum": "485172f8f9b1fcdaa1ff5d93668eaad6"
     },
     "functions/qc_normalization_need.R": {
       "checksum": "eeccc83f38bc417f9f4b94c45297eeac"
@@ -9431,32 +9843,35 @@
     "functions/run_normalyzerDE.R": {
       "checksum": "0c0134adfbcac9961d95b2efc6af84c3"
     },
+    "functions/sva_functions.R": {
+      "checksum": "8ea6c784569b844e6ea7f302eb5fabb7"
+    },
     "functions/venn_of_detected.R": {
-      "checksum": "e043894333ba3b6bd974d871763f3e05"
+      "checksum": "69de7228a9ebf8a0644e5ccc89626dd5"
     },
     "functions/venn_of_significant.R": {
       "checksum": "11d4e7157bb4b23f58c4eca68a5ac907"
     },
     "install_packages.R": {
-      "checksum": "9bb0659d914044f9794bdef1cb85dda3"
+      "checksum": "d96202a12ef67fe8fd2e83a7a178ec11"
     },
     "make_manifest.R": {
       "checksum": "5b7d25a5ca093a72359ae5a60e66cd93"
     },
     "parts/server_data.R": {
-      "checksum": "9917deda9b0dddb82b0964f8f6cf0182"
+      "checksum": "c605c29092a75d51d2ea7b7bc71faedf"
     },
     "parts/server_de.R": {
-      "checksum": "75fb20ded5eacd1bcb73816b36deeaaa"
+      "checksum": "e5e1c9a1e07adc1e9be42f1998a4ab45"
     },
     "parts/server_gsea.R": {
       "checksum": "8b5cc55942287291e35967c4915b25a7"
     },
     "parts/server_heatmap.R": {
-      "checksum": "448b8ac220ea29dde9a497db9b13c178"
+      "checksum": "fc2d5bae480caac62f5ab3026f945f3c"
     },
     "parts/server_impute.R": {
-      "checksum": "d50cfa0e58c47ff6cad721cc90746743"
+      "checksum": "1662b8ac286c90e6dd651ae23d4cb937"
     },
     "parts/server_jobs.R": {
       "checksum": "936bef30da10a2ae8f6e0fcc4b7921c9"
@@ -9468,25 +9883,31 @@
       "checksum": "dfd35545ef641d9d67050d30f786cd76"
     },
     "parts/server_reset.R": {
-      "checksum": "282b41b39451248e86df30ffd732e806"
+      "checksum": "451e3938c089fe20a25cf0819c628b72"
+    },
+    "parts/server_sva.R": {
+      "checksum": "14837dd7380211b3b31b1bca923bcec0"
     },
     "parts/ui_data.R": {
       "checksum": "6cda40841431c6b09ab1f193df5b33db"
     },
     "parts/ui_de.R": {
-      "checksum": "360fe34eb8992fd9592ab6469173f830"
+      "checksum": "fd8f910358a13052470120743d8b359b"
     },
     "parts/ui_heatmap.R": {
-      "checksum": "3a2959e1bdcda5c9bd9b6ce370cbb385"
+      "checksum": "76c936db766cb7de94a17a8abc33674e"
     },
     "parts/ui_impute.R": {
-      "checksum": "d0eadacf2a90cd283d08c57919539ff2"
+      "checksum": "cc01bbe1973cf58bed50f5bce9a3e314"
     },
     "parts/ui_norm.R": {
       "checksum": "3708659f8b1326e57d68c89d17d0328f"
     },
     "parts/ui_ora.R": {
-      "checksum": "6334f6530b105b31f369f4df5696a1c5"
+      "checksum": "92b02979b75d9b9670a2465f3b037b90"
+    },
+    "parts/ui_sva.R": {
+      "checksum": "6e85d06a477cad32bcc125382da6a117"
     },
     "scan_deps.R": {
       "checksum": "fe6d6d003b25eca190ce50fde7370d75"

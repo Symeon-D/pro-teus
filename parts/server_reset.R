@@ -11,6 +11,7 @@ observeEvent(list(input$expr_file, input$meta_file, input$load_demo),
   pre_subsets(list()); custom_subsets(list())
   ora_dir(NULL); ora_sets_run(character(0))
   gsea_res(NULL); gsea_dir(NULL)
+  sva_res(NULL); vp_pre(NULL); vp_post(NULL); post_res(NULL)
   expr_work(NULL); meta_work(NULL)
   updateNumericInput(session, "miss_thr", value = 70)
   app_gen(app_gen() + 1)      # re-creates tabs 2-6 and the data-page options with default values

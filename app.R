@@ -40,6 +40,7 @@ make_resettable <- function(tab, id) {
 }
 RT <- list(body_norm    = make_resettable(tab_norm(),    "body_norm"),
            body_impute  = make_resettable(tab_impute(),  "body_impute"),
+           body_sva     = make_resettable(tab_sva(),     "body_sva"),
            body_de      = make_resettable(tab_de(),      "body_de"),
            body_heatmap = make_resettable(tab_heatmap(), "body_heatmap"),
            body_ora     = make_resettable(tab_ora(),     "body_ora"))
@@ -108,7 +109,7 @@ PROTEUS_JS <- sprintf("
 ui <- navbarPage(
   "Pro-teus", id = "nav", windowTitle = "Pro-teus",
   header = tags$head(tags$style(HTML(PROTEUS_CSS)), tags$script(HTML(PROTEUS_JS))),
-  tab_data(), RT$body_norm$tab, RT$body_impute$tab, RT$body_de$tab, RT$body_heatmap$tab, RT$body_ora$tab,
+  tab_data(), RT$body_norm$tab, RT$body_impute$tab, RT$body_sva$tab, RT$body_de$tab, RT$body_heatmap$tab, RT$body_ora$tab,
   footer = div(
     style = paste("position:fixed; right:14px; bottom:14px; z-index:3000; background:#fff;",
                   "border:1px solid #ccc; border-radius:6px; padding:6px 10px;",
@@ -124,7 +125,7 @@ server <- function(input, output, session) {
     i <- id
     output[[i]] <- renderUI({ app_gen(); RT[[i]]$body })
   })
-  for (f in c("server_jobs.R", "server_data.R", "server_norm.R", "server_impute.R",
+  for (f in c("server_jobs.R", "server_data.R", "server_norm.R", "server_impute.R", "server_sva.R",
               "server_de.R", "server_heatmap.R", "server_ora.R", "server_gsea.R", "server_reset.R"))
     source(file.path("parts", f), local = TRUE)
 }

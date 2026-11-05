@@ -94,6 +94,11 @@ my_prepare_top_annotation_proteomics <- function(sample_info,
   group_vec <- as.character(sample_info$Group)
   group_labels <- names(table(sample_info$Group))
   group_indices <- split(seq_along(group_vec), group_vec)
+  # auto-fitted group font: one value for all groups, small enough for the narrowest group header
+  spans <- if (merge) rep(1, length(group_labels)) else as.numeric(table(sample_info$Group)[group_labels])
+  group_font_auto <- min(15, vapply(seq_along(group_labels),
+    function(g) fit_font(group_labels[g], spans[g] * col_width_mm, 9, max_font = 15), numeric(1)))
+  group_fs <- if (is.na(group_fontsize)) group_font_auto else group_fontsize
 
   # Group names above the blocks; font is fitted to the width of each group span
   draw_group_annotations <- function() {
@@ -109,7 +114,7 @@ my_prepare_top_annotation_proteomics <- function(sample_info,
         loc2 <- deviceLoc(x = unit(1, "npc"), y = unit(1, "npc"))
         seekViewport("global")
         w_mm <- convertWidth(loc2$x - loc1$x, "mm", valueOnly = TRUE)
-        fs <- if (is.na(group_fontsize)) min(base_font, fit_font(group_labels[g], w_mm, 9, max_font = 15)) else group_fontsize
+        fs <- group_fs
         # header box as wide as all colour boxes of the group, label centred in it
         grid.rect(x = (loc1$x + loc2$x) / 2, y = (loc1$y + loc2$y) / 2,
                   width = loc2$x - loc1$x, height = loc2$y - loc1$y, just = "center",
@@ -122,7 +127,7 @@ my_prepare_top_annotation_proteomics <- function(sample_info,
 
   list(top_annot_labels = top_annot_labels, col_split = col_split,
        gap_vect = gap_vect, draw_group_annotations = draw_group_annotations,
-       legends = legends)
+       legends = legends, fonts = list(sample = box_font, group = group_font_auto))
 }
 
 # Builds everything but does NOT draw (so Shiny can draw on screen or to file)
@@ -259,6 +264,7 @@ my_proteomics_heat_map_build <- function(input_object,
                                 labels_gp = gpar(fontsize = leg_font)))
 
   list(ht = ht, main_matrix = main_matrix, annot = top_annot_results, dropped = dropped,
+       fonts = top_annot_results$fonts,
        width_mm = .width_mm, height_mm = .height_mm, top_n = top_n, merge = merge)
 }
 
