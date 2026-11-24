@@ -16,7 +16,7 @@ See [CHANGELOG.md](CHANGELOG.md) for what changed since commit `f522158`.
 
 ## Run locally
 ```r
-Rscript install_packages.R     # once (pmartR and Bioconductor packages take a while)
+Rscript install_packages.R     # once (some packages take a while)
 shiny::runApp()
 ```
 
