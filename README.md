@@ -34,8 +34,8 @@ make_manifest.R       regenerates manifest.json for Posit Connect
 Regenerate `manifest.json` with `make_manifest.R` after changing packages, commit, and redeploy from GitHub.
 
 ## Optional configuration
-- `GITHUB_PAT` (token with `gist` scope): required for *Open in Morpheus* (also used for ORA helpers). Without it use *Download GCT* and open the file in
-  <https://software.broadinstitute.org/morpheus/> (File > Open).
+- `GITHUB_PAT` (token with `gist` scope): required for *Open in Morpheus* and *Open in Ora-cle*. Without it for Morpheus use *Download GCT* and open the file in
+  <https://software.broadinstitute.org/morpheus/> (File > Open) and for Ora-cle download the enrichment file and upload the file in <https://symeon-d.github.io/ora-cle/> (Upload CSV / TSV).
 
 ## Notes
 - Heavy jobs (ORA, imputation, NormalyzerDE) run in a background R process (`callr`), so *Stop process* works.
