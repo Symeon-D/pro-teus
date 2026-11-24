@@ -234,8 +234,10 @@ venn_of_detected <- function(input_matrix,
   export_width  <- width / sqrt(expand_limits)
   export_height <- height / sqrt(expand_limits)
 
-  ggplot2::ggsave(filename = filename, plot = p,
-                  width = export_width, height = export_height, dpi = dpi, bg = "white")
-  message("Venn diagram saved to: ", normalizePath(filename, mustWork = FALSE))
+  if (!is.null(filename)) {                         # only written when a file name is given
+    ggplot2::ggsave(filename = filename, plot = p,
+                    width = export_width, height = export_height, dpi = dpi, bg = "white")
+    message("Venn diagram saved to: ", normalizePath(filename, mustWork = FALSE))
+  }
   invisible(p)
 }

@@ -52,17 +52,30 @@
   vol_skip <- reactiveVal(NULL)
   vol_topn <- function(n) {                                    # top n by |t| of every selected volcano
     r <- de_res(); cns <- intersect(input$vol_contrasts %||% character(0), r$single_names)
-    unique(unlist(lapply(cns, function(cn) { tt <- r$tops[[cn]]; utils::head(tt$Protein[order(-abs(tt$t))], n) })))
+    dtm <- dt_matrix(r$dt)
+    unique(unlist(lapply(cns, function(cn) {
+      tt <- r$tops[[cn]]
+      sigp <- rownames(dtm)[dtm[, cn] != 0]                     # only significant proteins are labelled: fewer than n -> just those
+      tt <- tt[tt$Protein %in% sigp, , drop = FALSE]
+      utils::head(tt$Protein[order(-abs(tt$t))], n)
+    })))
   }
-  observeEvent(list(input$vol_nlab, input$vol_contrasts, de_res(), vol_picker$ready()), {
-    n <- input$vol_nlab; req(de_res())
+  # N is applied only once the user stops typing / clicking (the last value wins, no flicker through 5, 6, 7 ...)
+  vol_n_deb <- shiny::debounce(reactive(input$vol_nlab), 700)
+  vol_sent <- list()                                            # label sets we pushed into the bar (to tell them from user edits)
+  observeEvent(list(vol_n_deb(), input$vol_contrasts, de_res(), vol_picker$ready()), {
+    n <- vol_n_deb(); req(de_res())
     if (is.null(n) || is.na(n) || n < 0) return()
     if (!is.null(vol_skip()) && identical(as.numeric(n), as.numeric(vol_skip()))) { vol_skip(NULL); return() }   # N was set from the bar
-    vol_picker$set(if (n == 0) character(0) else vol_topn(n))
+    x <- if (n == 0) character(0) else vol_topn(n)
+    vol_sent <<- c(list(sort(x)), utils::head(vol_sent, 9))
+    vol_picker$set(x)
   })
-  observeEvent(vol_picker$selected(), {                         # bar -> N (exact with a single volcano selected)
+  observeEvent(vol_picker$selected(), {                         # bar -> N, only for genuine edits of the bar
     if (length(input$vol_contrasts %||% character(0)) != 1) return()
-    len <- length(vol_picker$selected()); n <- input$vol_nlab
+    sel <- sort(vol_picker$selected())
+    if (any(vapply(vol_sent, identical, logical(1), sel))) return()   # echo of what we sent (possibly delayed): ignore
+    len <- length(sel); n <- input$vol_nlab
     if (!is.null(n) && !is.na(n) && as.numeric(n) != len) { vol_skip(len); updateNumericInput(session, "vol_nlab", value = len) }
   }, ignoreInit = TRUE)
 
@@ -396,9 +409,30 @@
   # model parameters: directly under the contrasts matrix, above the F-test block
   output$de_meta_txt <- renderUI({
     r <- de_res(); req(r)
-    tags$p(style = "color:#555;", sprintf("Test: %s | duplicateCorrelation consensus: %s | arrayWeights: %s",
-           r$test, if (is.null(r$correlation)) "not used" else round(r$correlation, 3),
-           if (is.null(r$weights)) "not used" else "used"))
+    w <- r$weights
+    # same pattern as the volcano "Show data": a small toggle button, the table scrolls sideways in a bordered box.
+    # Rows: Group on top, then the sample, then its weight - one column per sample.
+    aw_ui <- if (is.null(w)) "not used" else {
+      smp <- names(w) %||% as.character(seq_along(w))
+      md <- tryCatch(sample_meta(), error = function(e) NULL)
+      grp <- if (!is.null(md) && "Group" %in% colnames(md) && !is.null(rownames(md)))
+               as.character(md[smp, "Group"]) else rep("", length(smp))
+      grp[is.na(grp)] <- ""
+      cell <- "white-space:nowrap; padding:3px 10px; border:1px solid #ddd; text-align:center;"
+      tagList("used ",
+        actionButton("aw_tog", "Show weights", icon = icon("table"), class = "btn-xs"),
+        conditionalPanel("input.aw_tog % 2 == 1",
+          div(style = "max-height:300px; overflow:auto; margin-top:6px; max-width:100%; border:1px solid #ddd;",
+            tags$table(style = "border-collapse:collapse; font-size:12px;",
+              tags$tr(tags$th("Group", style = paste(cell, "text-align:left; background:#f5f5f5;")),
+                      lapply(grp, function(g) tags$td(g, style = paste(cell, "background:#f5f5f5; font-weight:bold;")))),
+              tags$tr(tags$th("Sample", style = paste(cell, "text-align:left;")),
+                      lapply(smp, function(x) tags$td(x, style = cell))),
+              tags$tr(tags$th("Weight", style = paste(cell, "text-align:left;")),
+                      lapply(seq_along(w), function(i) tags$td(sprintf("%.3f", w[[i]]), style = cell)))))))
+    }
+    div(style = "color:#555; margin-bottom:10px;", sprintf("Test: %s | duplicateCorrelation consensus: %s | arrayWeights: ",
+           r$test, if (is.null(r$correlation)) "not used" else round(r$correlation, 3)), aw_ui)
   })
 
   # joint F-tests: same Up / Down / NS structure, one row per component contrast
@@ -438,7 +472,7 @@
       hr(), h4("Volcano plots"),
       ctl_row(
         ctl_dd("Contrasts", checkboxGroupInput("vol_contrasts", NULL, choices = cn, selected = cn)),
-        selectInput("vol_y", "Y axis", c("adj.P.Val", "P.Value"), selected = "adj.P.Val", width = fit_w("Y axis", c("adj.P.Val", "P.Value"))),
+        selectInput("vol_y", "Y axis", c("P.Value", "adj.P.Val"), selected = "P.Value", width = fit_w("Y axis", c("adj.P.Val", "P.Value"))),
         numericInput("vol_nlab", "Number of labels", 5, min = 0, step = 1, width = fit_w("Number of labels", "10")),
         numericInput("vol_label_size", "Label size", 2.5, min = 1, max = 8, step = 0.5, width = fit_w("Label size", "2.5")),
         checkboxInput("vol_grid", "Grid lines", FALSE)),
@@ -449,7 +483,7 @@
         ctl_dd("Contrasts", checkboxGroupInput("pp_contrasts", NULL, choices = cn, selected = cn)),
         selectInput("pp_type", "Plot type", PROTEIN_PLOT_TYPES, width = fit_w("Plot type", names(PROTEIN_PLOT_TYPES))),
         numericInput("pp_ncol", "Subplots per row", 4, min = 1, max = 8, width = fit_w("Subplots per row", "4")),
-        checkboxInput("pp_free", "Free y-axis", TRUE),
+        checkboxInput("pp_free", "Free y-axis", FALSE),
         checkboxInput("pp_ns", "show ns", FALSE)),
       protein_picker_ui("pp_de", "Proteins to plot (the top 2 of every selected contrast are selected by default)"),
       plotOutput("pp_plot", height = "auto"), downloadButton("dl_pp", "PNG"),
@@ -518,6 +552,10 @@
       }, ignoreInit = TRUE)
     })
   })
+
+  observeEvent(input$aw_tog, {
+    updateActionButton(session, "aw_tog", label = if (input$aw_tog %% 2 == 1) "Hide weights" else "Show weights")
+  }, ignoreInit = TRUE)
 
   bar_dt <- reactive({
     r <- de_res(); req(r)

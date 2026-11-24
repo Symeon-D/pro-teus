@@ -21,7 +21,7 @@ output$ora_avail <- renderUI({
 # ---- gene sets: DE subsets + the clusters of the current heatmap (c1, c2, ...) ----
 hm_clusters <- reactive({
   tt <- tryCatch(result_table(), error = function(e) NULL)
-  if (is.null(tt)) return(list())
+  if (is.null(tt) || is.null(tt$Cluster)) return(list())     # no cluster column unless rows are clustered
   s <- split(rownames(tt), tt$Cluster)
   if (length(s) < 2) return(list())            # a single cluster = all proteins, nothing new
   setNames(s, paste0("c", names(s)))

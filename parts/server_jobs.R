@@ -8,8 +8,9 @@ session$onSessionEnded(function() unlink(session_tmp, recursive = TRUE))
 
 job <- reactiveValues(proc = NULL, label = NULL, log = NULL, out = NULL, stopped = FALSE)
 job_cb <- NULL   # callback to run when the job finishes (kept outside reactiveValues)
+job_fail_cb <- NULL   # optional: called instead of an error message when the job (or its callback) fails
 
-start_job <- function(label, fun, args, on_done) {
+start_job <- function(label, fun, args, on_done, on_fail = NULL) {
   if (!is.null(job$proc) && job$proc$is_alive()) {
     showNotification("Another process is still running. Stop it first.", type = "warning")
     return(invisible(FALSE))
@@ -29,7 +30,7 @@ start_job <- function(label, fun, args, on_done) {
     args = list(fun = fun, args = args, src = src, outf = outf),
     stdout = logf, stderr = "2>&1", supervise = TRUE)
   job$proc <- proc; job$label <- label; job$log <- logf; job$out <- outf; job$stopped <- FALSE
-  job_cb <<- on_done
+  job_cb <<- on_done; job_fail_cb <<- on_fail
   invisible(TRUE)
 }
 
@@ -45,15 +46,19 @@ observe({
   invalidateLater(1000)
   p <- job$proc
   if (!p$is_alive()) isolate({
-    lbl <- job$label; outf <- job$out; cb <- job_cb; stopped <- job$stopped
+    lbl <- job$label; outf <- job$out; cb <- job_cb; stopped <- job$stopped; fcb <- job_fail_cb
     job$proc <- NULL
     if (stopped) {
       showNotification(paste(lbl, "stopped."), type = "warning")
     } else if (identical(p$get_exit_status(), 0L) && file.exists(outf)) {
       tryCatch({ cb(readRDS(outf)); showNotification(paste(lbl, "finished."), type = "message") },
-               error = function(e) showNotification(paste0(lbl, ": ", conditionMessage(e)), type = "error", duration = NULL))
+               error = function(e) {
+                 if (is.function(fcb)) fcb(conditionMessage(e))
+                 else showNotification(paste0(lbl, ": ", conditionMessage(e)), type = "error", duration = NULL)
+               })
     } else {
-      showNotification(paste0(lbl, " failed: ", job_log_tail(3)), type = "error", duration = NULL)
+      if (is.function(fcb)) fcb(job_log_tail(3))
+      else showNotification(paste0(lbl, " failed: ", job_log_tail(3)), type = "error", duration = NULL)
     }
   })
 })

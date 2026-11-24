@@ -41,8 +41,33 @@ tab_data <- function() {
         tabPanel("Sample info (with Group)", br(),
                  helpText("Double-click a cell to fix a value; click a header to rename the column. ",
                           "Samples are matched to the expression columns by name."),
+                 wellPanel(style = "padding:10px;",
+                   h5("Remove samples from the analysis"),
+                   helpText("Removed samples are ignored by every tab (filter, normalization, imputation, SVA, DE, heatmap, ...). ",
+                            "Changing the list resets the filter, normalization, imputation and the analysis results."),
+                   fluidRow(column(7, uiOutput("excl_pick_ui")),
+                            column(5, actionButton("excl_add", "Remove from analysis", class = "btn-warning btn-sm"),
+                                      actionButton("excl_restore", "Restore", class = "btn-sm"),
+                                      actionButton("excl_restore_all", "Restore all", class = "btn-sm"))),
+                   uiOutput("excl_status")),
                  DT::DTOutput("meta_dt"), br(), h5("Groups"), tableOutput("group_counts")),
-        tabPanel("QC plots", br(), uiOutput("qc_grid_ui"))))
+        tabPanel("QC plots", br(), uiOutput("qc_grid_ui")),
+        tabPanel("Outlier detection (rMd)", br(),
+          uiOutput("rmd_msg"),
+          fluidRow(
+            column(3, wellPanel(
+              checkboxGroupInput("rmd_metrics", "Metrics",
+                                 c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing"),
+                                 selected = c("MAD", "Kurtosis", "Skewness", "Correlation", "Proportion_Missing")),
+              helpText("Proportion_Missing is dropped automatically when there are no missing values."),
+              actionButton("rmd_run", "Compute rMd", class = "btn-primary"),
+              hr(),
+              numericInput("rmd_p", "p-value cutoff", 0.05, min = 0, max = 1, step = 0.01),
+              uiOutput("rmd_remove_ui"))),
+            column(9,
+              plotOutput("rmd_plot", height = "380px"),
+              h5("Flagged samples"), tableOutput("rmd_table"))),
+          uiOutput("rmd_box_ui"))))
     )
   )
 }

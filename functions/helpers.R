@@ -113,7 +113,7 @@ csv_data_uri <- function(df) {
 
 # a column is "text-like" when most of its non-missing values are not numbers
 is_text_col <- function(v) {
-  v <- as.character(v); v <- v[!is.na(v) & nzchar(v) & !startsWith(v, "#!")]
+  v <- clean_cell(v); v <- v[!is.na(v) & nzchar(v) & !startsWith(v, "#!") & !(v %in% c("T", "E", "N", "C", "M"))]
   if (!length(v)) return(FALSE)
   mean(is.na(suppressWarnings(as.numeric(v)))) > 0.5
 }
@@ -129,13 +129,34 @@ find_id_column <- function(df) {
   r
 }
 
+# trims spaces, quotes and a BOM around a cell
+clean_cell <- function(x) gsub("^[[:space:]\"'\ufeff]+|[[:space:]\"']+$", "", as.character(x), perl = TRUE)
+
+# Perseus annotation rows ("#!{Type}", "#!{Name}", ... and the type row whose cells are single letters such as T / E / N / C):
+# TRUE for every row that is not a protein. Looks at the first 30 rows only, where these rows live.
+perseus_meta_rows <- function(df) {
+  out <- logical(nrow(df))
+  if (!nrow(df) || !ncol(df)) return(out)
+  f <- clean_cell(df[[1]])
+  out <- !is.na(f) & startsWith(f, "#!")
+  top <- seq_len(min(30, nrow(df)))
+  for (r in top[!out[top]]) {
+    cells <- clean_cell(unlist(df[r, , drop = FALSE], use.names = FALSE))
+    cells <- cells[!is.na(cells) & nzchar(cells)]
+    if (length(cells) > 2 && all(nchar(cells) == 1 & cells %in% c("T", "E", "N", "C", "M", "t", "e")))
+      out[r] <- TRUE
+  }
+  out
+}
+
 # Looks at the file signature: Perseus ("#!{Type}" rows), MaxQuant (Majority protein IDs / LFQ intensity ...),
 # DIA-NN (Protein.Group + Genes) or a plain matrix.
 detect_expression_format <- function(path, name) {
   if (grepl("\\.(xlsx|xls)$", name, ignore.case = TRUE)) return(list(format = "table", quant = NULL))
-  lines <- readLines(path, n = 8, warn = FALSE)
+  lines <- readLines(path, n = 30, warn = FALSE)
   if (!length(lines)) stop("The file is empty.")
-  if (any(startsWith(lines, "#!") | grepl("\t#!\\{", lines))) return(list(format = "perseus", quant = NULL))
+  if (any(grepl("^[[:space:]\"'\ufeff]*#!", lines, perl = TRUE) | grepl("\t[\"']?#!\\{", lines)))
+    return(list(format = "perseus", quant = NULL))
   sep <- if (grepl("\t", lines[1])) "\t" else ","
   cols <- gsub("^\"|\"$", "", strsplit(lines[1], sep, fixed = TRUE)[[1]])
   if ("Majority protein IDs" %in% cols || any(startsWith(cols, "LFQ intensity ")) ) {
@@ -161,7 +182,7 @@ inspect_expression_file <- function(path, name) {
     df <- utils::read.table(path, header = TRUE, sep = sep, quote = "\"", comment.char = "", check.names = FALSE,
                             stringsAsFactors = FALSE, fill = TRUE)
   }
-  df <- df[!startsWith(as.character(df[[1]]), "#!"), , drop = FALSE]
+  df <- df[!perseus_meta_rows(df), , drop = FALSE]
   cols <- names(df)
   txt <- which(vapply(df, function(v) is_text_col(utils::head(v, 5000)), logical(1)))
   cand <- if (length(txt)) txt else seq_along(cols)     # every non-numeric column (all of them, not only the visible ones)
@@ -198,14 +219,14 @@ read_expression_file <- function(path, name, format = "auto", mq_quant = NULL, i
 
   df <- read.delim(path, check.names = FALSE, stringsAsFactors = FALSE, quote = "")
   if (format == "perseus") {
-    first <- as.character(df[[1]])
+    first <- clean_cell(df[[1]])
     type_row <- which(startsWith(first, "#!{Type}"))
     tp <- NULL
     if (length(type_row)) {            # first cell is "#!{Type}" + the type of the first column
-      tp <- as.character(unlist(df[type_row[1], ]))
+      tp <- clean_cell(unlist(df[type_row[1], ], use.names = FALSE))
       tp[1] <- sub("^#!\\{Type\\}", "", tp[1])
     }
-    df <- df[!startsWith(first, "#!"), , drop = FALSE]
+    df <- df[!perseus_meta_rows(df), , drop = FALSE]
     i <- need_id(df)
     num_idx <- if (!is.null(tp)) which(tp == "E") else setdiff(seq_len(ncol(df)), i)
     num_idx <- setdiff(num_idx, i)
@@ -299,3 +320,13 @@ ctl_row <- function(...) shiny::div(style = "display:flex; flex-wrap:wrap; gap:1
 ctl_dd  <- function(label, ..., btn = "Select contrasts")
   shiny::div(style = "margin-bottom:15px;", shiny::tags$label(label), shiny::br(),
              shinyWidgets::dropdownButton(label = btn, circle = FALSE, status = "default", inline = TRUE, ...))
+
+# small "reset" button; starts disabled (the value is at its default) - the server enables it when the value changes
+rst_btn <- function(id, disabled = TRUE) {
+  if (disabled) shiny::actionButton(paste0("rst_", id), "reset", class = "btn-xs", disabled = NA)
+  else shiny::actionButton(paste0("rst_", id), "reset", class = "btn-xs")
+}
+# label with its reset button on the same line
+lab_rst <- function(label, id, btn = rst_btn(id))
+  shiny::div(style = "display:flex; align-items:center; gap:8px; margin-bottom:2px;",
+             shiny::tags$label(label, style = "margin:0;"), btn)

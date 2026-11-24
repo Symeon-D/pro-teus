@@ -95,19 +95,60 @@ output$group_vars_ui <- renderUI({
 sample_meta <- reactive({
   req(meta_raw(), input$sample_col, input$group_vars)
   md <- meta_raw()
+  req(input$sample_col %in% colnames(md))
+  gvs <- intersect(input$group_vars, colnames(md))      # a selection left over from the previous file is ignored
+  req(length(gvs) > 0)
   md$Sample <- as.character(md[[input$sample_col]])
-  gv <- md[, input$group_vars, drop = FALSE]
+  gv <- md[, gvs, drop = FALSE]
   md$Group <- do.call(paste, c(lapply(gv, as.character), sep = " "))   # single space
   md <- md[!duplicated(md$Sample), ]
   rownames(md) <- md$Sample
   md
 })
 
-common <- reactive({
+# samples removed from the analysis (Sample info tab, or the rMd outlier tab). Removing them here, where the
+# expression columns are matched to the sample info, makes EVERY tab ignore them.
+excluded <- reactiveVal(character(0))
+all_matched <- reactive({
   req(expr_raw(), sample_meta())
-  cs <- intersect(colnames(expr_raw()), rownames(sample_meta()))
-  validate(need(length(cs) > 1, "No overlap between expression column names and sample names."))
+  intersect(colnames(expr_raw()), rownames(sample_meta()))
+})
+common <- reactive({
+  cs <- setdiff(all_matched(), excluded())
+  validate(need(length(cs) > 1, if (length(all_matched()) > 1 && length(excluded()))
+                  "Fewer than two samples are left: restore some samples in the 'Sample info' tab."
+                else "No overlap between expression column names and sample names."))
   cs
+})
+
+output$excl_pick_ui <- renderUI({
+  am <- all_matched(); ex <- excluded()
+  selectizeInput("excl_pick", NULL, multiple = TRUE, width = "100%",
+                 choices = setNames(am, ifelse(am %in% ex, paste0(am, "  (removed)"), am)),
+                 options = list(placeholder = "choose samples...", plugins = list("remove_button")))
+})
+observeEvent(input$excl_add, {
+  pk <- input$excl_pick; req(length(pk))
+  excluded(union(excluded(), pk))
+})
+observeEvent(input$excl_restore, {
+  pk <- input$excl_pick; req(length(pk))
+  excluded(setdiff(excluded(), pk))
+})
+observeEvent(input$excl_restore_all, excluded(character(0)))
+output$excl_status <- renderUI({
+  ex <- excluded()
+  am <- tryCatch(all_matched(), error = function(e) character(0)); req(length(am) > 0)
+  md <- sample_meta()
+  cnt_all <- table(md[am, "Group"]); cnt <- table(factor(md[setdiff(am, ex), "Group"], levels = names(cnt_all)))
+  small <- names(cnt)[cnt < 2]
+  tagList(
+    if (length(ex)) tags$p(tags$b(sprintf("Removed from the analysis (%d): ", length(ex))), paste(ex, collapse = ", "))
+    else tags$p(style = "color:#777;", "No sample is removed."),
+    if (length(small))
+      div(class = "alert alert-warning", style = "padding:6px; font-size:12px;",
+          "Group(s) with fewer than 2 samples: ", paste0(small, " (", cnt[small], ")", collapse = ", "),
+          ". Statistics that need replicates (limma contrasts, rMd, ...) cannot use them."))
 })
 
 output$data_status <- renderUI({
@@ -142,9 +183,10 @@ group_colors_all <- reactive({
 raw_aligned <- reactive(expr_raw()[, common(), drop = FALSE])
 filt_rv <- reactiveVal(NULL); norm_rv <- reactiveVal(NULL); imp_rv <- reactiveVal(NULL)
 norm_label <- reactiveVal(NULL); imp_label <- reactiveVal(NULL); filter_msg <- reactiveVal("")
+norm_skip_msg <- reactiveVal(character(0))       # "Normalization skipped: ..." shown in the status bar
 
 observeEvent(raw_aligned(), {
-  filt_rv(NULL); norm_rv(NULL); imp_rv(NULL)
+  filt_rv(NULL); norm_rv(NULL); imp_rv(NULL); norm_skip_msg(character(0))
   norm_label(NULL); imp_label(NULL); filter_msg("")
 })
 
@@ -164,6 +206,11 @@ status_ui <- renderUI({
     badge(if (is.null(norm_rv())) "Normalization: not applied" else paste("Normalized:", norm_label()), !is.null(norm_rv())), "\u2192",
     badge(if (is.null(imp_rv())) "Imputation: not applied" else paste("Imputed:", imp_label()), !is.null(imp_rv())), "\u2192",
     badge(if (is.null(sv_now)) "SVs: none" else paste("SVs:", paste(colnames(sv_now), collapse = ", ")), !is.null(sv_now)),
+    if (length(excluded()))
+      tags$span(class = "label label-warning", style = "margin-left:4px; font-size:12px;",
+                sprintf("%d sample(s) removed", length(excluded()))),
+    if (length(norm_skip_msg()))
+      tags$span(class = "label label-danger", style = "margin-left:4px; font-size:12px;", norm_skip_msg()),
     tags$small(style = "color:#777; margin-left:8px;", "Downstream tabs use the latest stage."))
 })
 for (id in c("pipeline_status_data", "pipeline_status_norm", "pipeline_status_imp", "pipeline_status_sva", "pipeline_status_de"))
@@ -269,7 +316,7 @@ qc_venn_obj <- reactive({
   mdv$Group <- factor(mdv$Group, levels = g); mdv <- mdv[order(mdv$Group), ]; mdv$Group <- as.character(mdv$Group)
   res <- tryCatch(run_in_tmpdir(function() venn_of_detected(
     m, mdv, threshold = (input$venn_thr %||% 70) / 100, group_colors = group_colors_all(),
-    group_labels = titles, filename = "venn.png",
+    group_labels = titles, filename = NULL,
     font_scale = input$venn_font %||% 1, count_size = na_null(input$venn_count),
     group_label_size = na_null(input$venn_label), expand_limits = input$venn_ratio %||% 1.5,
     fill_alpha = input$venn_alpha %||% 0.45))$value, error = function(e) e)
@@ -286,8 +333,43 @@ output$qc_grid_ui <- renderUI({
     fluidRow(column(6, cell("Number of proteins per sample", imageOutput("qc_bar", height = "auto"), "dl_qc_bar")),
              column(6, cell("Box plot", imageOutput("qc_box", height = "auto"), "dl_qc_box"))),
     fluidRow(column(6, cell("PCA", plotOutput("qc_pca", height = "330px"), "dl_qc_pca")),
-             column(6, cell("Venn diagram", plotOutput("qc_venn", height = "330px"), "dl_qc_venn"))))
+             column(6, cell("Venn diagram", plotOutput("qc_venn", height = "330px"), "dl_qc_venn"))),
+    uiOutput("venn_regions_ui"))
 })
+
+# ---- Proteins in the diagram (detected-proteins Venn only): every region with its proteins ----
+venn_vr <- reactive({
+  req(data_ready()); g <- input$venn_groups
+  validate(need(length(g) >= 2, ""))
+  titles <- vapply(seq_along(g), function(i) input[[paste0("vt_", i)]] %||% g[i], character(1))
+  md <- qc_group_md()
+  venn_regions(detected_sets(qc_matrix(), md, g, (input$venn_thr %||% 70) / 100, titles))
+})
+output$venn_regions_ui <- renderUI({
+  vr <- tryCatch(venn_vr(), error = function(e) NULL); req(vr)
+  tagList(hr(), h5("Proteins in the diagram"),
+    helpText("Every protein is listed in exactly one region (the exact combination of groups it was detected in). ",
+             "Click a row to see its proteins, then copy them from the box."),
+    fluidRow(column(6, DT::DTOutput("venn_reg_dt")),
+             column(6, uiOutput("venn_reg_box"))),
+    downloadButton("dl_venn_xlsx", "Excel workbook (3 sheets)", class = "btn-sm"))
+})
+output$venn_reg_dt <- DT::renderDT({
+  vr <- venn_vr()
+  DT::datatable(vr$summary[, c("Region", "Count")], rownames = FALSE, selection = "single",
+                class = "compact stripe", options = list(pageLength = 15, dom = "tip", ordering = FALSE))
+})
+output$venn_reg_box <- renderUI({
+  vr <- venn_vr(); i <- input$venn_reg_dt_rows_selected
+  if (is.null(i)) return(helpText("Select a region on the left."))
+  r <- vr$summary$Region[i]; p <- vr$members[[r]]
+  tagList(tags$b(sprintf("%s: %d protein(s)", r, length(p))),
+          tags$textarea(readonly = NA, rows = 12, style = "width:100%; font-family:monospace;",
+                        onclick = "this.select();", paste(p, collapse = "\n")))
+})
+output$dl_venn_xlsx <- downloadHandler(
+  filename = function() "Venn_detected_proteins.xlsx",
+  content = function(file) venn_workbook(venn_vr(), file))
 
 output$qc_bar <- renderImage({ list(src = qc_bar_path(), contentType = "image/png", width = "100%") }, deleteFile = FALSE)
 output$qc_box <- renderImage({ list(src = qc_box_path(), contentType = "image/png", width = "100%") }, deleteFile = FALSE)
@@ -300,6 +382,72 @@ output$dl_qc_pca  <- downloadHandler("QC_PCA.png", function(file) ggplot2::ggsav
 output$dl_qc_venn <- downloadHandler("QC_venn.png", function(file)
   ggplot2::ggsave(file, qc_venn_obj(), width = 8 / sqrt(input$venn_ratio %||% 1.5),
                   height = 7 / sqrt(input$venn_ratio %||% 1.5), dpi = 300, bg = "white"))
+
+# ---- rMd outlier detection (pmartR): computed once, the slider only re-flags ----
+rmd_res <- reactiveVal(NULL)
+rmd_valid <- reactive({
+  r <- rmd_res(); if (is.null(r)) return(NULL)
+  if (identical(r$key, tryCatch(stage_key(qc_matrix()), error = function(e) NA))) r else NULL
+})
+output$rmd_msg <- renderUI({
+  if (!requireNamespace("pmartR", quietly = TRUE))
+    return(div(class = "alert alert-danger", style = "padding:6px; font-size:12px;",
+               "The 'pmartR' package is not installed on this server."))
+  NULL
+})
+observeEvent(input$rmd_run, {
+  m <- qc_matrix(); md <- qc_group_md()
+  mets <- input$rmd_metrics
+  if (!anyNA(m) && "Proportion_Missing" %in% mets) {
+    mets <- setdiff(mets, "Proportion_Missing")
+    showNotification("Proportion_Missing was left out: there are no missing values (it would be all zero).", type = "message")
+  }
+  if (length(mets) < 2) return(showNotification("Choose at least two metrics.", type = "warning"))
+  withProgress(message = "Computing robust Mahalanobis distances...", value = 0.5, {
+    r <- tryCatch(rmd_compute(m, md, metrics = mets), error = function(e) e)
+  })
+  if (inherits(r, "error")) return(showNotification(paste("rMd filter:", conditionMessage(r)), type = "error", duration = NULL))
+  r$key <- stage_key(m); rmd_res(r)
+})
+rmd_flag <- reactive({ r <- rmd_valid(); req(r); rmd_flagged(r, rmd_pv()) })
+rmd_pv <- reactive({ p <- input$rmd_p; if (is.null(p) || is.na(p) || p <= 0 || p > 1) 0.05 else p })
+output$rmd_plot <- renderPlot({
+  r <- rmd_valid()
+  validate(need(!is.null(r), "Press 'Compute rMd' (uses the data stage selected for the QC plots)."))
+  rmd_make_plot(r, rmd_pv(), group_colors_all())
+}, res = 100)
+output$rmd_table <- renderTable({
+  r <- rmd_valid(); req(r)
+  d <- rmd_flag_table(r, rmd_pv())
+  validate(need(nrow(d) > 0, "No sample is flagged at this cutoff."))
+  d
+}, digits = 4)
+output$rmd_remove_ui <- renderUI({
+  r <- rmd_valid(); req(r)
+  n <- length(rmd_flag())
+  if (n == 0) return(helpText("No outliers at this cutoff."))
+  actionButton("rmd_remove", sprintf("Remove detected outliers (%d)", n), class = "btn-warning")
+})
+observeEvent(input$rmd_remove, {
+  fl <- rmd_flag(); req(length(fl))
+  excluded(union(excluded(), fl))
+  showNotification(sprintf("%d sample(s) removed from the analysis: %s", length(fl), paste(fl, collapse = ", ")), type = "warning")
+})
+output$rmd_box_ui <- renderUI({
+  fl <- rmd_flag(); if (!length(fl)) return(NULL)
+  show <- head(fl, 24)
+  tagList(h5("Why were they flagged? Boxplots of each metric (flagged sample = X)"),
+          if (length(fl) > length(show)) helpText(sprintf("Showing the first %d of %d.", length(show), length(fl))),
+          fluidRow(lapply(seq_along(show), function(i)
+            column(12, plotOutput(paste0("rmd_box_", i), height = "430px")))))
+})
+for (i in 1:24) local({
+  k <- i
+  output[[paste0("rmd_box_", k)]] <- renderPlot({
+    r <- rmd_valid(); fl <- rmd_flag(); req(r, k <= length(fl))
+    rmd_sample_plot(r, fl[k], rmd_pv())
+  }, res = 100)
+})
 
 # ---- automatic tab switching on the Data page ----
 observeEvent(list(input$expr_file, input$meta_file, input$load_demo), ignoreInit = TRUE, {

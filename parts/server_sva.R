@@ -1,10 +1,12 @@
 # ======================= 4. BATCH & SVA =======================
 sva_m <- reactive(final_expr())
 sva_meta <- reactive({ cs <- colnames(sva_m()); sample_meta()[cs, , drop = FALSE] })
-sva_vars <- reactive(setdiff(names(sva_meta()), c("Sample", input$sample_col)))
+sva_vars <- reactive({                       # the created Group first, then the other variables
+  v <- setdiff(names(sva_meta()), c("Sample", input$sample_col))
+  c(intersect("Group", v), setdiff(v, "Group"))
+})
 sva_guess <- reactive({
   v <- sva_vars(); g <- guess_var_types(sva_meta()[, v, drop = FALSE])
-  if ("Group" %in% names(g)) g[["Group"]] <- "exclude"          # the combined group duplicates its variables
   g
 })
 output$sva_types_ui <- renderUI({

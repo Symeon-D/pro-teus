@@ -78,6 +78,7 @@ run_limma_pipeline <- function(y, design, contrast_matrix,
   if (use_aw) {
     progress("arrayWeights")
     aw <- arrayWeights(y, design = design)
+    names(aw) <- colnames(y)
   }
 
   corr <- NULL
@@ -267,7 +268,7 @@ diverging_bar_plot <- function(deg_summary, show_labels = TRUE, num_size_pt = 12
                        labels = function(x) scales::comma(abs(x)), expand = c(0, 0)) +
     scale_fill_manual(values = c(Upregulated = "#d73027", Downregulated = "#4575b4", "F-test (any change)" = "#7f7f7f")) +
     geom_vline(xintercept = 0, color = "black", linewidth = 0.8) +
-    geom_text(aes(label = scales::comma(abs(Count)), hjust = ifelse(Plot_Count >= 0, -0.25, 1.25)),
+    geom_text(aes(label = scales::comma(abs(Count)), hjust = ifelse(Direction == "Downregulated", 1.25, -0.25)),
               size = num_size_pt / ggplot2::.pt, colour = "black") +
     labs(title = NULL, x = NULL, y = NULL) +
     theme_classic(base_size = 16) +
@@ -298,6 +299,6 @@ venn_sig_plot <- function(dt, contrasts, direction = "either", colors = NULL,
                      title = NULL, subtitle = "",
                      font_scale = font_scale, count_size = count_size,
                      group_label_size = group_label_size, expand_limits = expand_limits,
-                     fill_alpha = fill_alpha, filename = "v.png"))$value
+                     fill_alpha = fill_alpha, filename = NULL))$value
   p + ggplot2::theme(plot.title = ggplot2::element_blank(), plot.subtitle = ggplot2::element_blank())
 }

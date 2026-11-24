@@ -38,11 +38,13 @@ output$norm_need_ui <- renderUI({
 })
 
 # ---- NormalyzerDE in a background process (so it can be stopped) ----
-run_norm_job <- function(after) {
+# on_fail(reason) is called when NormalyzerDE cannot run (typically: too many missing values)
+run_norm_job <- function(after, on_fail = NULL) {
   m <- norm_input(); md <- sample_meta()[colnames(m), , drop = FALSE]
   is_log <- isTRUE(input$norm_is_log)
   key <- paste(stage_key(m), is_log); cache <- norm_cache()
   if (!is.null(cache) && identical(cache$key, key)) { after(cache); return(invisible()) }
+  norm_skip_msg(character(0))
   out <- file.path(session_tmp, paste0("normalyzer_", format(Sys.time(), "%H%M%S")))
   lin <- if (is_log) 2^m else m                      # linear scale in; NormalyzerDE returns log2
   start_job("NormalyzerDE", "run_normalyzerDE",
@@ -72,11 +74,17 @@ run_norm_job <- function(after) {
         }
       }
       after(cache)
-    })
+    },
+    on_fail = on_fail)
 }
 
 observeEvent(input$run_norm_bench, {
-  run_norm_job(function(cache) updateTabsetPanel(session, "norm_tabs", selected = "Benchmark"))
+  run_norm_job(function(cache) updateTabsetPanel(session, "norm_tabs", selected = "Benchmark"),
+               on_fail = function(why) {
+                 norm_skip_msg("Normalization skipped: too many missing values")
+                 showNotification(paste0("Normalization skipped: too many missing values. The data stay as they are. (",
+                                         substr(why, 1, 150), ")"), type = "warning", duration = 12)
+               })
 })
 
 output$norm_bench_ui <- renderUI({
@@ -115,6 +123,13 @@ observeEvent(input$apply_norm, {
       nm <- names(cache$mats)[tolower(names(cache$mats)) == tolower(choice)]
       if (!length(nm)) stop("Method '", choice, "' was not produced by NormalyzerDE.")
       norm_rv(cache$mats[[nm[1]]]); norm_label(nm[1]); finish()
+    }, on_fail = function(why) {
+      # try first; on error keep the data as they are and let the pipeline continue
+      norm_rv(norm_input()); norm_label("skipped (too many missing values)")
+      norm_skip_msg("Normalization skipped: too many missing values")
+      showNotification(paste0("Normalization skipped: too many missing values. The data are kept as they are and the pipeline continues. (",
+                              substr(why, 1, 150), ")"), type = "warning", duration = 12)
+      finish()
     })
   }
 })
@@ -131,7 +146,7 @@ output$norm_after_plot <- renderPlot({
               long(post, paste("After:", norm_label())))
   df$Stage <- factor(df$Stage, levels = unique(df$Stage))
   # no normalization: before == after, so show only the un-normalized boxplot
-  if (identical(norm_label(), "none")) df <- df[df$Stage == "Before normalization", ]
+  if (grepl("^(none|skipped)", norm_label())) df <- df[df$Stage == "Before normalization", ]
   ggplot(df, aes(Sample, Value, fill = Group)) + geom_boxplot(outlier.size = 0.3, linewidth = 0.3) +
     facet_wrap(~Stage, ncol = 2, scales = "free_y") +
     scale_fill_manual(values = group_colors_all()) + labs(y = "log2 intensity") +

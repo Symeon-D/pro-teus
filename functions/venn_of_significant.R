@@ -161,12 +161,12 @@ venn_of_significant <- function(decide_matrix,
       )
     )
 
-  ggplot2::ggsave(filename = filename, plot = p,
-                  width = 8, height = 7, dpi = 300,
-                  bg = "white")
-
-  message("Venn diagram saved to: ",
-          normalizePath(filename, mustWork = FALSE))
+  if (!is.null(filename)) {
+    ggplot2::ggsave(filename = filename, plot = p,
+                    width = 8, height = 7, dpi = 300,
+                    bg = "white")
+    message("Venn diagram saved to: ", normalizePath(filename, mustWork = FALSE))
+  }
 
   invisible(p)
 }

@@ -71,6 +71,10 @@
     setNames(out, names(el))
   })
 
+  # size-type inputs are applied once the user stops changing them (like the volcano labels), not at every step
+  sz <- throttle(reactive(list(width_cm = input$width_cm, height_cm = input$height_cm, cell_mm = input$cell_mm,
+                               leg_height = input$leg_height, leg_width = input$leg_width, leg_font = input$leg_font)), 500)
+
   core <- reactive({
     cs <- hm_samples()
     mat <- hm_expr()[, cs, drop = FALSE]
@@ -89,11 +93,18 @@
     rs <- if (isTRUE(input$cluster_rows) && identical(input$split_by, "split") && sn > 0) sn else NULL
     rk <- if (isTRUE(input$cluster_rows) && identical(input$split_by, "km") && sn > 0) sn else NULL
     # fit the visible window: use the on-screen size of the plot unless a size is typed in
-    scr_w <- session$clientData$output_hm_plot_width
-    scr_h <- session$clientData$output_hm_plot_height
+    dir <- input$hm_dir %||% "normal"
+    shp <- if (identical(dir, "circular")) "rect" else (input$hm_shape %||% "rect")
+    # the window (the scroll area around the plot, in px) is what everything is fitted into
+    win <- input$hm_win
+    win_w <- (win$w %||% 1100) / 96 * 25.4
+    win_h <- (win$h %||% 620) / 96 * 25.4
     res <- my_proteomics_heat_map_build(
       input_object = mat, sample_metadata = md,
-      top_n = if (identical(input$hm_source, "genes") || tolower(tn) == "all" || tn == "") "all" else as.numeric(tn),
+      top_n = {
+        tnv <- suppressWarnings(as.numeric(tn))
+        if (identical(input$hm_source, "genes") || is.na(tnv) || tnv < 1) "all" else tnv
+      },
       merge = input$merge, cluster_rows = input$cluster_rows,
       show_row_dend = isTRUE(input$cluster_rows) && isTRUE(input$show_row_dend),
       dist_param = input$dist_param %||% "euclidean",
@@ -102,16 +113,24 @@
       group_colors = group_colors(), zscore_limits = input$zlim,
       color_low = input$color_low, color_mid = input$color_mid,
       color_high = input$color_high,
-      col_fontsize = if (font_auto$col) NA else (input$col_fontsize %||% NA), row_fontsize = input$row_fontsize,
+      col_fontsize = if (font_auto$col) NA else (input$col_fontsize %||% NA),
+      row_fontsize = if (font_auto$gene) NA else (input$row_fontsize %||% NA),
       group_fontsize = if (font_auto$grp) NA else (input$group_fontsize %||% NA),
-      width = if (!is.na(input$width_mm)) input$width_mm else if (!is.null(scr_w)) scr_w / 96 * 25.4,
-      height = if (!is.na(input$height_mm)) input$height_mm else if (!is.null(scr_h)) scr_h / 96 * 25.4,
+      width = if (!size_auto$w && !is.na(sz()$width_cm %||% NA)) sz()$width_cm * 10 else NULL,
+      height = if (!size_auto$h && !is.na(sz()$height_cm %||% NA)) sz()$height_cm * 10 else NULL,
+      win_w = win_w, win_h = win_h,
+      gene_side = input$gene_side, show_group_legend = isTRUE(input$show_group_legend %||% TRUE),
       row_split = rs, row_km = rk,
       extra_cols = extra_use(),
       extra_colors = extra_colors(),
       show_sample_names = isTRUE(input$show_sample_names),
       show_group_names = isTRUE(input$show_group_names),
-      leg_width = input$leg_width, leg_height = input$leg_height, leg_font = input$leg_font)
+      leg_width = sz()$leg_width %||% 10, leg_height = if (leg_auto$on) NULL else sz()$leg_height, leg_font = sz()$leg_font %||% 16,
+      direction = dir, shape = shp,
+      cell_mm = if (shp != "rect" && !cell_auto$on) sz()$cell_mm else NULL,
+      circle_by_value = isTRUE(input$circ_by_val),
+      circ_opts = list(cluster = isTRUE(input$cluster_rows), dist = input$dist_param, linkage = input$hclust_param,
+                       gap = input$circ_gap %||% 8, start = input$circ_start %||% 180))
     if (res$dropped > 0)
       showNotification(sprintf("K-means: %d protein(s) with missing / non-finite values were left out.", res$dropped),
                        type = "warning", duration = 8)
@@ -136,28 +155,105 @@
 
   # draw_heatmap() returns the HeatmapList: renderPlot would print() it and redraw the whole
   # figure, wiping the group-name headers. invisible() prevents that.
+  # The plot is always drawn at its canvas size (= the window when auto-fitted). A bigger canvas (typed width / height,
+  # or a bigger box size) simply scrolls inside the window.
+  canvas_px <- reactive({ cr <- core(); round(c(cr$width_mm, cr$height_mm) / 25.4 * 96) })
+
+  # box / circle size: shows the auto-fitted size; changing it fixes the size (scrolls if bigger than the window)
+  # values written by the app itself (auto-fit) are remembered, so their echo from the browser is never mistaken for a user edit
+  ph <- new.env()
+  prog_add <- function(k, v) ph[[k]] <- utils::tail(c(ph[[k]], v), 20)
+  is_prog <- function(k, v, tol = 0.051) length(ph[[k]]) > 0 && any(abs(ph[[k]] - v) < tol)
+  cell_auto <- reactiveValues(on = TRUE)
+  observe({
+    cr <- core(); v <- cr$cell_mm; req(is.finite(v))
+    if (cell_auto$on) {
+      v <- max(0.05, floor(v * 20) / 20); prog_add("cell", v)             # floor to the slider step: the plot never gets bigger than the window
+      updateSliderInput(session, "cell_mm", value = v, min = 0.05, max = max(20, ceiling(v * 2)))
+    }
+  })
+  observeEvent(input$cell_mm, {
+    if (!is_prog("cell", input$cell_mm, 0.06)) cell_auto$on <- FALSE
+  }, ignoreInit = TRUE)
+  observeEvent(input$rst_cell_mm, cell_auto$on <- TRUE)
   output$hm_plot <- renderPlot({
     input$show_group_names; input$show_sample_names     # explicit dependencies: toggles redraw at once
     draw_heatmap(core()); invisible(NULL)
-  }, res = 96)
+  }, res = 96, width = function() canvas_px()[1], height = function() canvas_px()[2])
 
-  # Z-score bar height may grow up to the full plot height
+  # circular: these options do not apply
+  # (they are also unticked while greyed out, and get their old state back afterwards)
+  circ_saved <- NULL
+  observeEvent(input$hm_dir, {
+    circ <- identical(input$hm_dir, "circular")
+    ids <- c("show_sample_names", "show_group_legend", "show_row_dend")
+    if (circ && is.null(circ_saved)) {
+      circ_saved <<- lapply(ids, function(i) isTRUE(input[[i]])); names(circ_saved) <- ids
+      for (i in ids) updateCheckboxInput(session, i, value = FALSE)
+    } else if (!circ && !is.null(circ_saved)) {
+      for (i in ids) updateCheckboxInput(session, i, value = circ_saved[[i]])
+      circ_saved <<- NULL
+    }
+    session$sendCustomMessage("set_dis", list(ids = as.list(ids), dis = circ))
+  }, ignoreNULL = FALSE)
+
+  # Z-score bar: default = height of the heatmap body (until the user types / drags a value; "auto" goes back)
+  leg_auto <- reactiveValues(on = TRUE)
+  leg_prog <- reactiveVal(NA_real_)
+  body_h_rv <- reactiveVal(NULL)                         # only changes when the body height really changes
   observe({
-    h <- session$clientData$output_hm_plot_height; req(h)
-    mm <- floor(h / 96 * 25.4)
-    updateSliderInput(session, "leg_height", max = max(60, mm))
+    h <- core()$body_h_mm
+    if (is.finite(h) && !identical(round(h), isolate(body_h_rv()))) body_h_rv(round(h))
   })
+  leg_bump <- reactiveVal(0)                             # a reset re-creates the slider at the default
+  output$leg_height_ui <- renderUI({
+    h <- body_h_rv(); leg_bump(); req(h)
+    mx <- max(60, h)
+    v <- if (isolate(leg_auto$on)) h else min(mx, isolate(input$leg_height) %||% h)
+    prog_add("leg", v)
+    sliderInput("leg_height", NULL, 15, mx, v, step = 1)
+  })
+  output$leg_rst_ui <- renderUI(rst_btn("leg_height", disabled = leg_auto$on))
+  observeEvent(input$leg_height, {
+    if (!is_prog("leg", input$leg_height, 0.6)) leg_auto$on <- FALSE
+  }, ignoreInit = TRUE)
+  observeEvent(input$rst_leg_height, { leg_auto$on <- TRUE; leg_bump(leg_bump() + 1) })
+
+  # ---- figure size: the boxes show the auto-fitted size in cm; typing a value overrides, reset goes back ----
+  size_auto <- reactiveValues(w = TRUE, h = TRUE)
+  size_prog <- reactiveValues(w = NA_real_, h = NA_real_)
+  observe({
+    cr <- core()
+    if (size_auto$w) { v <- round(cr$width_mm / 10, 1);  prog_add("w", v); updateNumericInput(session, "width_cm", value = v) }
+    if (size_auto$h) { v <- round(cr$height_mm / 10, 1); prog_add("h", v); updateNumericInput(session, "height_cm", value = v) }
+  })
+  observeEvent(input$width_cm, {
+    v <- input$width_cm; if (is.null(v) || is.na(v)) return()
+    if (!is_prog("w", v)) size_auto$w <- FALSE
+  }, ignoreInit = TRUE)
+  observeEvent(input$height_cm, {
+    v <- input$height_cm; if (is.null(v) || is.na(v)) return()
+    if (!is_prog("h", v)) size_auto$h <- FALSE
+  }, ignoreInit = TRUE)
+  observeEvent(input$rst_width_cm, size_auto$w <- TRUE)
+  observeEvent(input$rst_height_cm, size_auto$h <- TRUE)
 
   result_table <- reactive({
     cr <- core()
     pdf(NULL, width = cr$width_mm / 25.4, height = cr$height_mm / 25.4)
     on.exit(dev.off())
-    extract_clusters(draw_heatmap(cr), cr$main_matrix)
+    d <- extract_clusters(draw_heatmap(cr), cr$main_matrix, cr$direction)
+    if (!isTRUE(input$cluster_rows)) d$Cluster <- NULL          # a cluster column only exists when rows are clustered
+    d
   })
-  output$mat_tbl <- renderTable({
-    d <- head(result_table(), 200)
-    out <- cbind(rownames(d), d); names(out)[1] <- id_label(); out
-  }, rownames = FALSE)
+  output$mat_tbl <- DT::renderDT({
+    d <- result_table()
+    out <- cbind(rownames(d), d); names(out)[1] <- id_label()
+    DT::datatable(out, rownames = FALSE, selection = "none", class = "compact stripe nowrap",
+                  options = list(scrollX = TRUE, scrollY = "52vh", pageLength = 50, deferRender = TRUE,
+                                 lengthMenu = c(25, 50, 100, 500))) %>%
+      DT::formatRound(columns = setdiff(seq_len(ncol(out)), c(1, which(names(out) == "Cluster"))), digits = 3)
+  })
 
   file_stub <- reactive(paste0("Heatmap_top", core()$top_n, if (core()$merge) "_merged" else ""))
 
@@ -198,20 +294,117 @@ hm_picker <- protein_picker_server("pp_hm", sig = hi$sig, all = hi$all)
 hm_genes <- hm_picker$selected
 
 # ---- label fonts: the boxes show the auto-fitted size; typing a size switches to manual, "auto-fit" goes back ----
-font_auto <- reactiveValues(col = TRUE, grp = TRUE)
-font_prog <- reactiveValues(col = NA_real_, grp = NA_real_)           # the value we wrote ourselves
+font_auto <- reactiveValues(col = TRUE, grp = TRUE, gene = TRUE)
+font_prog <- reactiveValues(col = NA_real_, grp = NA_real_, gene = NA_real_)           # the value we wrote ourselves
 observe({
   cr <- core()
-  if (font_auto$col) { v <- round(cr$fonts$sample, 1); font_prog$col <- v; updateNumericInput(session, "col_fontsize", value = v) }
-  if (font_auto$grp) { v <- round(cr$fonts$group, 1);  font_prog$grp <- v; updateNumericInput(session, "group_fontsize", value = v) }
+  if (font_auto$gene && is.finite(cr$fonts$gene)) { v <- round(cr$fonts$gene, 1); prog_add("fg", v); updateNumericInput(session, "row_fontsize", value = v) }
+  if (font_auto$col && is.finite(cr$fonts$sample)) { v <- round(cr$fonts$sample, 1); prog_add("fc", v); updateNumericInput(session, "col_fontsize", value = v) }
+  if (font_auto$grp && is.finite(cr$fonts$group)) { v <- round(cr$fonts$group, 1);  prog_add("fgr", v); updateNumericInput(session, "group_fontsize", value = v) }
 })
 observeEvent(input$col_fontsize, {
   v <- input$col_fontsize; if (is.null(v) || is.na(v)) return()
-  if (!isTRUE(all.equal(v, font_prog$col))) font_auto$col <- FALSE
+  if (!is_prog("fc", v)) font_auto$col <- FALSE
 }, ignoreInit = TRUE)
 observeEvent(input$group_fontsize, {
   v <- input$group_fontsize; if (is.null(v) || is.na(v)) return()
-  if (!isTRUE(all.equal(v, font_prog$grp))) font_auto$grp <- FALSE
+  if (!is_prog("fgr", v)) font_auto$grp <- FALSE
 }, ignoreInit = TRUE)
-observeEvent(input$col_auto, font_auto$col <- TRUE)
-observeEvent(input$group_auto, font_auto$grp <- TRUE)
+observeEvent(input$row_fontsize, {
+  v <- input$row_fontsize; if (is.null(v) || is.na(v)) return()
+  if (!is_prog("fg", v)) font_auto$gene <- FALSE
+}, ignoreInit = TRUE)
+observeEvent(input$rst_row_fontsize, font_auto$gene <- TRUE)
+observeEvent(input$rst_col_fontsize, font_auto$col <- TRUE)
+observeEvent(input$rst_group_fontsize, font_auto$grp <- TRUE)
+
+# ---- reset buttons: enabled only when the value differs from its default ----
+rst_send <- function(id, changed) session$sendCustomMessage("rst_state", list(id = id, dis = !changed))
+observe({                       # auto-fitted boxes: changed = the user typed a value
+  rst_send("col_fontsize", !font_auto$col); rst_send("row_fontsize", !font_auto$gene)
+  rst_send("group_fontsize", !font_auto$grp)
+  rst_send("width_cm", !size_auto$w); rst_send("height_cm", !size_auto$h)
+  rst_send("cell_mm", !cell_auto$on)
+})
+rst_static <- list(                 # fixed defaults
+  zlim = list("slider", c(-2, 2)), leg_width = list("slider", 10), leg_font = list("slider", 16),
+  circ_gap = list("slider", 8), circ_start = list("slider", 180),
+  top_n = list("text", ""), split_n = list("numeric", 2),
+  color_low = list("colour", "blue"), color_mid = list("colour", "white"), color_high = list("colour", "red"))
+same_val <- function(a, b, type) {
+  if (is.null(a)) return(TRUE)
+  if (type == "colour") return(tryCatch(identical(col2rgb(a), col2rgb(b)), error = function(e) FALSE))
+  if (type == "text") return(identical(trimws(as.character(a)), b))
+  isTRUE(all.equal(as.numeric(a), as.numeric(b)))
+}
+for (id in names(rst_static)) local({
+  id <- id; type <- rst_static[[id]][[1]]; def <- rst_static[[id]][[2]]
+  observeEvent(input[[paste0("rst_", id)]], {
+    switch(type,
+      slider  = updateSliderInput(session, id, value = def),
+      numeric = updateNumericInput(session, id, value = def),
+      text    = updateTextInput(session, id, value = def),
+      colour  = colourpicker::updateColourInput(session, id, value = def))
+  })
+  observeEvent(input[[id]], rst_send(id, !same_val(input[[id]], def, type)), ignoreNULL = FALSE)
+})
+
+# gene-name position: sideways = below / above the heatmap, normal = right / left
+output$gene_side_ui <- renderUI({
+  req(isTRUE(input$show_genes))
+  d <- input$hm_dir %||% "normal"
+  if (d == "circular") return(NULL)
+  if (d == "sideways") selectInput("gene_side", "Gene names position", c("down", "up"), selected = "down")
+  else selectInput("gene_side", "Gene names position", c("right", "left"), selected = "right")
+})
+
+# ---- "Open in Morpheus": the processed matrix goes to a secret Gist (GITHUB_PAT needed, like ORA-cle),
+#      then Morpheus is opened with ?dataset=<raw url>. GCT 1.3 carries the sample annotations (Group + extra variables).
+gct13_text <- function(m, anno) {
+  num <- function(x) ifelse(is.finite(x), sprintf("%.5g", x), "")
+  rn <- make.unique(rownames(m))
+  body <- vapply(seq_len(nrow(m)), function(i) paste(c(rn[i], rn[i], num(m[i, ])), collapse = "\t"), character(1))
+  ann <- vapply(names(anno), function(a) paste(c(a, "", as.character(anno[[a]])), collapse = "\t"), character(1))
+  paste(c("#1.3", paste(nrow(m), ncol(m), 1, ncol(anno), sep = "\t"),
+          paste(c("id", "Description", colnames(m)), collapse = "\t"), ann, body), collapse = "\n")
+}
+create_gist_raw <- function(txt, filename, description) {
+  tk <- gist_token(); if (!nzchar(tk)) return(NULL)
+  resp <- tryCatch(httr::POST("https://api.github.com/gists",
+      httr::add_headers(Authorization = paste("Bearer", tk), Accept = "application/vnd.github+json"),
+      body = list(description = description, public = FALSE,
+                  files = setNames(list(list(content = txt)), filename)),
+      encode = "json", httr::timeout(30)), error = function(e) NULL)
+  if (is.null(resp) || httr::status_code(resp) != 201) return(NULL)
+  httr::content(resp)$files[[1]]$raw_url
+}
+observeEvent(input$morph_open, {
+  cr <- tryCatch(core(), error = function(e) NULL)
+  if (is.null(cr)) { session$sendCustomMessage("morph_fail", ""); return(showNotification("The heatmap is not ready yet.", type = "warning")) }
+  m <- cr$main_matrix
+  anno <- if (isTRUE(cr$merge)) data.frame(Group = colnames(m))
+          else sample_meta()[colnames(m), unique(c("Group", extra_use())), drop = FALSE]
+  anno[] <- lapply(anno, as.character)
+  if (!nzchar(gist_token())) {
+    session$sendCustomMessage("morph_fail", "")
+    return(showNotification("Morpheus needs a public link to the data, which needs a GITHUB_PAT (token with 'gist' scope) - see the instructions. Meanwhile use 'Download GCT' and drag the file into Morpheus (File > Open).",
+                            type = "error", duration = 15))
+  }
+  raw <- create_gist_raw(gct13_text(m, anno), "proteus_matrix.gct", "Pro-teus export for Morpheus")
+  if (is.null(raw)) {
+    session$sendCustomMessage("morph_fail", "")
+    return(showNotification("Could not create the Gist (check the GITHUB_PAT token).", type = "error", duration = 10))
+  }
+  session$sendCustomMessage("morph_go", paste0("https://software.broadinstitute.org/morpheus/?json=",
+    utils::URLencode(as.character(jsonlite::toJSON(list(dataset = raw), auto_unbox = TRUE)), reserved = TRUE)))
+})
+
+output$dl_gct <- downloadHandler(
+  filename = function() "proteus_matrix.gct",
+  content = function(file) {
+    cr <- core(); m <- cr$main_matrix
+    anno <- if (isTRUE(cr$merge)) data.frame(Group = colnames(m))
+            else sample_meta()[colnames(m), unique(c("Group", extra_use())), drop = FALSE]
+    anno[] <- lapply(anno, as.character)
+    writeLines(gct13_text(m, anno), file)
+  })
