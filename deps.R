@@ -7,7 +7,7 @@ if (FALSE) {
   library(shiny); library(ggplot2); library(ComplexHeatmap); library(circlize)
   library(colourpicker); library(shinyWidgets); library(limma); library(matrixStats)
   library(RColorBrewer); library(readxl); library(dplyr); library(tidyr); library(scales)
-  library(ggrepel); library(callr); library(base64enc); library(DT)
+  library(ggrepel); library(callr); library(base64enc); library(DT); library(pmartR); library(sva); library(variancePartition)
 
   # --- from install_packages.R ---
   library(zip); library(data.table); library(pdftools); library(cowplot); library(reshape2)

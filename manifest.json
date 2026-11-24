@@ -4306,6 +4306,40 @@
         "Archs": "x64"
       }
     },
+    "glmpca": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "glmpca",
+        "Title": "Dimension Reduction of Non-Normally Distributed Data",
+        "Version": "0.2.0",
+        "Description": "Implements a generalized version of principal components analysis\n    (GLM-PCA) for dimension reduction of non-normally distributed data such as\n    counts or binary matrices.\n    Townes FW, Hicks SC, Aryee MJ, Irizarry RA (2019) <doi:10.1186/s13059-019-1861-6>.\n    Townes FW (2019) <arXiv:1907.02647>.",
+        "Authors@R": "c(person(\"F. William\", \"Townes\", email = \"will.townes@gmail.com\",\n            role = c(\"aut\", \"cre\", \"cph\")),\n            person(\"Kelly\", \"Street\", email = \"street.kelly@gmail.com\", role=\"aut\"),\n            person(\"Jake\", \"Yeung\", email = \"jakeyeung@gmail.com\", role=\"ctb\"))",
+        "License": "LGPL (>= 3) | file LICENSE",
+        "Depends": "R (>= 3.5),",
+        "Imports": "MASS, methods, stats, utils",
+        "Suggests": "covr, ggplot2, knitr, logisticPCA, markdown, Matrix,\ntestthat,",
+        "URL": "https://github.com/willtownes/glmpca",
+        "BugReports": "https://github.com/willtownes/glmpca/issues",
+        "Language": "en-US",
+        "VignetteBuilder": "knitr",
+        "LazyData": "false",
+        "RoxygenNote": "7.1.1",
+        "Encoding": "UTF-8",
+        "NeedsCompilation": "no",
+        "Packaged": "2020-07-18 17:07:28 UTC; townesf",
+        "Author": "F. William Townes [aut, cre, cph],\n  Kelly Street [aut],\n  Jake Yeung [ctb]",
+        "Maintainer": "F. William Townes <will.townes@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-07-18 17:30:02 UTC",
+        "Built": "R 4.6.1; ; 2026-07-14 01:09:40 UTC; windows",
+        "RemoteType": "standard",
+        "RemotePkgRef": "glmpca",
+        "RemoteRef": "glmpca",
+        "RemoteRepos": "https://cran.rstudio.com",
+        "RemoteSha": "0.2.0"
+      }
+    },
     "glue": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -6514,6 +6548,37 @@
         "RemoteSha": "2.0"
       }
     },
+    "parallelly": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "parallelly",
+        "Version": "1.48.0",
+        "Title": "Enhancing the 'parallel' Package",
+        "Imports": "parallel, tools, utils",
+        "Suggests": "commonmark, base64enc",
+        "VignetteBuilder": "parallelly",
+        "Authors@R": "c(\n        person(\"Henrik\", \"Bengtsson\",\n               role = c(\"aut\", \"cre\", \"cph\"),\n               email = \"henrikb@braju.com\",\n               comment = c(ORCID = \"0000-0002-7579-5165\")),\n        person(\"Mike\", \"Cheng\",\n               role = c(\"ctb\"),\n               email = \"mikefc@coolbutuseless.com\")\n    )",
+        "Description": "Utility functions that enhance the 'parallel' package and support the built-in parallel backends of the 'future' package.  For example, availableCores() gives the number of CPU cores available to your R process as given by the operating system, 'cgroups' and Linux containers, R options, and environment variables, including those set by job schedulers on high-performance compute clusters. If none is set, it will fall back to parallel::detectCores(). Another example is 'parallel::makeCluster(type = \"RPSOCK\")', which is backward compatible with 'parallel::makeCluster()' while doing a better job in setting up remote cluster workers without the need for configuring the firewall to do port-forwarding to your local computer.",
+        "License": "LGPL (>= 2.1)",
+        "LazyLoad": "TRUE",
+        "ByteCompile": "TRUE",
+        "URL": "https://parallelly.futureverse.org,\nhttps://github.com/futureverse/parallelly",
+        "BugReports": "https://github.com/futureverse/parallelly/issues",
+        "Language": "en-US",
+        "Encoding": "UTF-8",
+        "Config/roxygen2/version": "8.0.0",
+        "RoxygenNote": "7.3.3",
+        "NeedsCompilation": "yes",
+        "Packaged": "2026-06-29 13:09:02 UTC; hb",
+        "Author": "Henrik Bengtsson [aut, cre, cph] (ORCID:\n    <https://orcid.org/0000-0002-7579-5165>),\n  Mike Cheng [ctb]",
+        "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2026-06-29 15:40:02 UTC",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-06-29 23:51:27 UTC; windows",
+        "Archs": "x64"
+      }
+    },
     "patchwork": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -6833,6 +6898,43 @@
         "Date/Publication": "2023-10-02 06:50:08 UTC",
         "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-06-25 01:50:43 UTC; windows",
         "Archs": "x64"
+      }
+    },
+    "pmartR": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "pmartR",
+        "Type": "Package",
+        "Title": "Panomics Marketplace - Quality Control and Statistical Analysis\nfor Panomics Data",
+        "Version": "2.5.1",
+        "Date": "2025-10-21",
+        "Authors@R": "c(\n    person(\"Lisa\", \"Bramer\", email = \"lisa.bramer@pnnl.gov\", role = c(\"aut\", \"cre\")), \n    person(\"Kelly\", \"Stratton\", email = \"kelly.stratton@pnnl.gov\", role = c(\"aut\")), \n    person(\"Daniel\", \"Claborne\", email = \"daniel.claborne@pnnl.gov\", role = c(\"aut\")), \n    person(\"Evan\", \"Glasscock\", role = c(\"ctb\")), \n    person(\"Rachel\", \"Richardson\", role = c(\"ctb\")), \n    person(\"David\", \"Degnan\", role=c(\"ctb\")),\n    person(\"Evan\", \"Martin\", role=c(\"ctb\"))\n    )",
+        "Description": "Provides functionality for quality control processing and statistical analysis of mass spectrometry (MS) omics data, in particular proteomic (either at the peptide or the protein level), lipidomic, and metabolomic data, as well as RNA-seq based count data and nuclear magnetic resonance (NMR) data. This includes data transformation, specification of groups that are to be compared against each other, filtering of features and/or samples, data normalization, data summarization (correlation, PCA), and statistical comparisons between defined groups.  Implements methods described in:  Webb-Robertson et al. (2014) <doi:10.1074/mcp.M113.030932>.  Webb-Robertson et al. (2011) <doi:10.1002/pmic.201100078>.  Matzke et al. (2011) <doi:10.1093/bioinformatics/btr479>.  Matzke et al. (2013) <doi:10.1002/pmic.201200269>.  Polpitiya et al. (2008) <doi:10.1093/bioinformatics/btn217>.  Webb-Robertson et al. (2010) <doi:10.1021/pr1005247>.  ",
+        "License": "BSD_2_clause + file LICENSE",
+        "Depends": "R (>= 4.1.0),",
+        "URL": "https://pmartr.github.io/pmartR/, https://github.com/pmartR/pmartR",
+        "BugReports": "https://github.com/pmartR/pmartR/issues",
+        "LinkingTo": "Rcpp, RcppArmadillo, BH",
+        "biocViews": "",
+        "Imports": "Rcpp (>= 0.12.8), data.table, doParallel, dplyr, ggplot2,\ne1071, foreach, methods, mvtnorm, pcaMethods, purrr, rrcov,\nstringr, tidyr (>= 1.3.0), RColorBrewer, magrittr, parallelly,\npatchwork, glmpca,",
+        "Suggests": "knitr, limma, rmarkdown, edgeR, DESeq2, plotly, scales,\nS4Vectors, survival, testthat, trelliscopejs, pmartRdata,\nvdiffr",
+        "Additional_repositories": "https://pmartR.github.io/drat",
+        "RoxygenNote": "7.3.2",
+        "Encoding": "UTF-8",
+        "NeedsCompilation": "yes",
+        "Packaged": "2025-10-22 16:22:02 UTC; rich401",
+        "Author": "Lisa Bramer [aut, cre],\n  Kelly Stratton [aut],\n  Daniel Claborne [aut],\n  Evan Glasscock [ctb],\n  Rachel Richardson [ctb],\n  David Degnan [ctb],\n  Evan Martin [ctb]",
+        "Maintainer": "Lisa Bramer <lisa.bramer@pnnl.gov>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-10-22 18:30:02 UTC",
+        "Built": "R 4.6.1; x86_64-w64-mingw32; 2026-07-14 03:42:40 UTC; windows",
+        "Archs": "x64",
+        "RemoteType": "standard",
+        "RemotePkgRef": "pmartR",
+        "RemoteRef": "pmartR",
+        "RemoteRepos": "https://cran.rstudio.com",
+        "RemoteSha": "2.5.1"
       }
     },
     "png": {
@@ -9768,6 +9870,9 @@
     "app.R": {
       "checksum": "9cd2ebcb7979201f92f8ba83ca7f8f22"
     },
+    "CHANGELOG.md": {
+      "checksum": "ecf9c89edd4554d606bddd7161bc562c"
+    },
     "CNAME": {
       "checksum": "a12693e5d2451e64fddf3aa9877743a0"
     },
@@ -9775,10 +9880,10 @@
       "checksum": "5fa983f0a2f8c7c6a587d89604e52756"
     },
     "deps.R": {
-      "checksum": "0225abec95265e9d2a2476d6efc2e3b9"
+      "checksum": "ab94ecbad9d08b18dcb30ce6acc76892"
     },
     "functions/de_functions.R": {
-      "checksum": "f9fdb64b369659c210e87fb6b15e1289"
+      "checksum": "f075b533057ec8d3506fde8f2b665330"
     },
     "functions/evaluate_imputation.R": {
       "checksum": "4283e417da5822dc6f474650400e2982"
@@ -9799,13 +9904,16 @@
       "checksum": "0ef00cc55ea94003400215151b299dd2"
     },
     "functions/heatmap_functions.R": {
-      "checksum": "aafdf93ae8b8b698dd44577ebdd2e8bb"
+      "checksum": "d8c148364caf18100e952a4c5577a2df"
     },
     "functions/helpers.R": {
-      "checksum": "fd964e57aa22a92cd1e470370b360a06"
+      "checksum": "4ea2090070a563fcb21b3c858547b384"
     },
     "functions/my_custom_gpro_dotplot.R": {
       "checksum": "0aeaf500e157de75d1e27039d629e297"
+    },
+    "functions/my_rmd_filter.R": {
+      "checksum": "e7afe5b81e87acf831afa573861e755e"
     },
     "functions/my_volcano_plot_proteomics.R": {
       "checksum": "f8ba3ee55788c2f6990e77478ac1d4c0"
@@ -9847,55 +9955,58 @@
       "checksum": "8ea6c784569b844e6ea7f302eb5fabb7"
     },
     "functions/venn_of_detected.R": {
-      "checksum": "69de7228a9ebf8a0644e5ccc89626dd5"
+      "checksum": "9ea0a52e1fe6992b64b28ceb5ed2eb5c"
     },
     "functions/venn_of_significant.R": {
-      "checksum": "11d4e7157bb4b23f58c4eca68a5ac907"
+      "checksum": "5678353d9c83bb7291fc2bb2fdeec4cb"
+    },
+    "functions/venn_regions.R": {
+      "checksum": "f132b08c397cb67f31702ceb753eb335"
     },
     "install_packages.R": {
-      "checksum": "d96202a12ef67fe8fd2e83a7a178ec11"
+      "checksum": "776b4814611128cd024fd22342f09e71"
     },
     "make_manifest.R": {
       "checksum": "5b7d25a5ca093a72359ae5a60e66cd93"
     },
     "parts/server_data.R": {
-      "checksum": "c605c29092a75d51d2ea7b7bc71faedf"
+      "checksum": "157758f4efb3e1c9e2ec77cec7ba644f"
     },
     "parts/server_de.R": {
-      "checksum": "e5e1c9a1e07adc1e9be42f1998a4ab45"
+      "checksum": "b3d59766d506ee3c24918cf962f25292"
     },
     "parts/server_gsea.R": {
       "checksum": "8b5cc55942287291e35967c4915b25a7"
     },
     "parts/server_heatmap.R": {
-      "checksum": "fc2d5bae480caac62f5ab3026f945f3c"
+      "checksum": "afb7f7d3527c84e2038d3c675bb54ca4"
     },
     "parts/server_impute.R": {
       "checksum": "1662b8ac286c90e6dd651ae23d4cb937"
     },
     "parts/server_jobs.R": {
-      "checksum": "936bef30da10a2ae8f6e0fcc4b7921c9"
+      "checksum": "384cd078052ee6478e4f511bdded43a0"
     },
     "parts/server_norm.R": {
-      "checksum": "9b58cbc282eee975ccd60a8ecd515cb6"
+      "checksum": "9aeadefc184a669de14121e615c8e62d"
     },
     "parts/server_ora.R": {
-      "checksum": "dfd35545ef641d9d67050d30f786cd76"
+      "checksum": "42bdcec57d5357f98c409e6ec397f09d"
     },
     "parts/server_reset.R": {
-      "checksum": "451e3938c089fe20a25cf0819c628b72"
+      "checksum": "a6e09e5dd3cfe03db746a1cdfd547aea"
     },
     "parts/server_sva.R": {
-      "checksum": "14837dd7380211b3b31b1bca923bcec0"
+      "checksum": "ba4fcc805322beed8622b0ce26b67e06"
     },
     "parts/ui_data.R": {
-      "checksum": "6cda40841431c6b09ab1f193df5b33db"
+      "checksum": "48b847c50fc23b626fb8104e9e1536a1"
     },
     "parts/ui_de.R": {
       "checksum": "fd8f910358a13052470120743d8b359b"
     },
     "parts/ui_heatmap.R": {
-      "checksum": "76c936db766cb7de94a17a8abc33674e"
+      "checksum": "49d8c4349d06a00482f43988c48402b9"
     },
     "parts/ui_impute.R": {
       "checksum": "cc01bbe1973cf58bed50f5bce9a3e314"
@@ -9908,6 +10019,9 @@
     },
     "parts/ui_sva.R": {
       "checksum": "6e85d06a477cad32bcc125382da6a117"
+    },
+    "README.md": {
+      "checksum": "d2c4fd84ae500424429b23cb150bbc57"
     },
     "scan_deps.R": {
       "checksum": "fe6d6d003b25eca190ce50fde7370d75"
