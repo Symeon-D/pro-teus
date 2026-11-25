@@ -23,7 +23,7 @@ shiny::runApp()
 ## Layout
 ```
 app.R                 entry point
-parts/                UI + server pieces, one pair per tab (the folder must NOT be named R/)
+parts/                UI + server pieces, one pair per tab
 functions/            analysis and plotting functions
 data/                 demo data
 install_packages.R    package list
